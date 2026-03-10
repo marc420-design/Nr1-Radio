@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Brand colours */
+  --color-nr1-black: #070709;
+  --color-nr1-cyan: #00E5FF;
+  --color-nr1-crimson: #FF2D55;
+  --color-nr1-grey: #1A1A1F;
+  --color-nr1-muted: #6B7280;
+
+  /* Typography */
+  --font-heading: "Bebas Neue", sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-body: "DM Sans", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #070709;
+  --foreground: #ededed;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* Equalizer animation */
+@keyframes eq-bar {
+  0%, 100% { transform: scaleY(0.2); }
+  50% { transform: scaleY(1); }
+}
+
+.eq-bar {
+  animation: eq-bar 0.8s ease-in-out infinite;
+  transform-origin: bottom;
+}
+.eq-bar:nth-child(2) { animation-delay: 0.15s; }
+.eq-bar:nth-child(3) { animation-delay: 0.3s; }
+
+/* Live pulse */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.live-pulse {
+  animation: live-pulse 1.2s ease-in-out infinite;
+}
+
+/* Cyan glow */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+.glow-cyan:hover {
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.7);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #1A1A1F;
+}
+::-webkit-scrollbar-thumb {
+  background: #00E5FF;
+  border-radius: 2px;
 }

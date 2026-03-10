@@ -1,0 +1,26 @@
+{
+  "name": "NR1 DNB Radio",
+  "short_name": "NR1 Radio",
+  "description": "Norwich's finest drum & bass radio station. Listen live 24/7.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#00E5FF",
+  "background_color": "#070709",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "entertainment"],
+  "lang": "en-GB"
+}
