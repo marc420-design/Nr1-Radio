@@ -13,7 +13,7 @@ export function NowPlayingCard({ track, artist, artwork }: NowPlayingCardProps) 
 
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-nr1-grey border border-white/10">
+      <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-nr1-grey border border-nr1-cyan/20">
         {artwork ? (
           <Image
             src={artwork}

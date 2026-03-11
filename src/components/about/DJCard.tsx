@@ -7,7 +7,7 @@ interface DJCardProps {
 
 export function DJCard({ dj }: DJCardProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-nr1-grey overflow-hidden group hover:border-nr1-cyan/30 transition-colors">
+    <div className="rounded-xl border border-white/10 bg-nr1-grey overflow-hidden group hover:border-nr1-cyan/40 hover:shadow-[0_0_20px_rgba(0,229,255,0.08)] transition-all duration-300">
       <div className="relative h-64 bg-nr1-black">
         {dj.photo_url ? (
           <Image

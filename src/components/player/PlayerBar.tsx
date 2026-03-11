@@ -18,7 +18,7 @@ export function PlayerBar() {
   return (
     <>
       {/* Mobile: fixed bottom bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-nr1-grey/95 backdrop-blur-md border-t border-white/10 px-4 py-3">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-nr1-grey/95 backdrop-blur-md border-t border-nr1-cyan/20 mobile-bar-glow px-4 py-3">
         <div className="flex items-center gap-3">
           <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
           <div className="flex-1 min-w-0">
@@ -32,19 +32,21 @@ export function PlayerBar() {
       </div>
 
       {/* Desktop: hero section (rendered inline, not fixed) */}
-      <div className="hidden lg:flex flex-col items-center gap-6 py-12">
-        <div className="flex items-center gap-4">
-          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
-          <EqualizerBars isPlaying={isPlaying} />
+      <div className="hidden lg:flex justify-center w-full">
+        <div className="player-card flex flex-col items-center gap-6 py-10 px-12 w-full max-w-md">
+          <div className="flex items-center gap-4">
+            <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
+            <EqualizerBars isPlaying={isPlaying} />
+          </div>
+          <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
+          <NowPlayingCard track={track} artist={artist} artwork={artwork} />
+          <VolumeControl
+            volume={volume}
+            isMuted={isMuted}
+            onVolumeChange={setVolume}
+            onToggleMute={toggleMute}
+          />
         </div>
-        <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
-        <NowPlayingCard track={track} artist={artist} artwork={artwork} />
-        <VolumeControl
-          volume={volume}
-          isMuted={isMuted}
-          onVolumeChange={setVolume}
-          onToggleMute={toggleMute}
-        />
       </div>
     </>
   );

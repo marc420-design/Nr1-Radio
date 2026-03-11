@@ -13,27 +13,39 @@ export default async function HomePage() {
     <div className="min-h-[calc(100vh-4rem)] flex flex-col">
       {/* Hero */}
       <section className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
+
+        {/* Logo block */}
+        <div className="relative flex flex-col items-center text-center mb-8">
+          {/* Radial cyan bloom behind logo */}
+          <div className="hero-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+
+          <div className="relative flex justify-center mb-4 z-10">
             <Image
               src="/icons/icon-512.png"
               alt="NR1 DNB Radio"
               width={180}
               height={180}
               priority
-              className="drop-shadow-[0_0_30px_rgba(0,229,255,0.2)]"
+              className="drop-shadow-[0_0_40px_rgba(0,229,255,0.3)]"
             />
           </div>
-          <p className="font-heading text-2xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
+
+          <p className="relative z-10 font-heading text-2xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
             DNB RADIO
           </p>
-          <p className="font-mono text-xs text-nr1-muted mt-3 tracking-widest uppercase">
+          <p className="relative z-10 font-mono text-xs text-nr1-muted mt-2 tracking-widest uppercase">
             Norwich · Drum &amp; Bass · 24/7
           </p>
+
+          {/* Stat badges */}
+          <div className="relative z-10 flex flex-wrap justify-center gap-2 mt-4">
+            <span className="stat-badge">30+ DJs</span>
+            <span className="stat-badge">Est. 2018</span>
+            <span className="stat-badge">Norwich, UK</span>
+          </div>
         </div>
 
-        {/* Player (mobile: pinned bar via CSS; desktop: inline hero) */}
+        {/* Player */}
         <PlayerBar />
 
         {/* External player link */}

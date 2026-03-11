@@ -22,7 +22,9 @@ export default async function SchedulePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-10">
-        <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide">Schedule</h1>
+        <div className="section-heading-rule">
+          <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide">Schedule</h1>
+        </div>
         <p className="font-mono text-sm text-nr1-muted mt-2">
           Weekly show guide · All times UK local
         </p>

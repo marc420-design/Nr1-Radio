@@ -40,7 +40,7 @@ export function VolumeControl({ volume, isMuted, onVolumeChange, onToggleMute }:
         value={displayVolume}
         onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
         aria-label="Volume"
-        className="w-24 h-1 accent-nr1-cyan cursor-pointer"
+        className="vol-slider"
       />
     </div>
   );

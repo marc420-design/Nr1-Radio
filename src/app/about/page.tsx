@@ -23,7 +23,9 @@ export default async function AboutPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       {/* About NR1 */}
       <section className="max-w-3xl">
-        <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide mb-6">About NR1</h1>
+        <div className="section-heading-rule mb-6">
+          <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide">About NR1</h1>
+        </div>
         <div className="space-y-4 font-body text-white/70 leading-relaxed">
           <p>
             NR1 Drum & Bass — est. 2018. Norwich&apos;s home of underground DNB, broadcasting 24/7 with
@@ -89,9 +91,9 @@ export default async function AboutPage() {
       {/* DJs */}
       {djs.length > 0 && (
         <section>
-          <h2 className="font-heading text-4xl sm:text-5xl text-white tracking-wide mb-8">
-            Our DJs
-          </h2>
+          <div className="section-heading-rule mb-8">
+            <h2 className="font-heading text-4xl sm:text-5xl text-white tracking-wide">Our DJs</h2>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {djs.map((dj) => (
               <DJCard key={dj.id} dj={dj} />
