@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createSSEConnection, getNowPlaying, STATION_SHORTCODE_VALUE } from "@/lib/azuracast";
 import type { NowPlayingData, HistoryEntry } from "@/lib/azuracast";
 
 interface NowPlayingState {
@@ -47,7 +46,10 @@ export function useNowPlaying(): NowPlayingState {
 
   const poll = useCallback(async () => {
     try {
-      const data = await getNowPlaying();
+      // Use the server-side proxy to avoid mixed-content blocking
+      const res = await fetch("/api/nowplaying", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = (await res.json()) as NowPlayingData;
       setState(parseNowPlaying(data));
     } catch {
       // Silently fail — keep last known state
@@ -68,14 +70,8 @@ export function useNowPlaying(): NowPlayingState {
   }, []);
 
   useEffect(() => {
-    // Try SSE first
-    const sse = createSSEConnection(STATION_SHORTCODE_VALUE);
-    if (!sse) {
-      sseFailedRef.current = true;
-      startPolling();
-      return;
-    }
-
+    // Try SSE via proxy (avoids mixed-content blocking)
+    const sse = new EventSource("/api/sse");
     sseRef.current = sse;
 
     sse.onmessage = (event) => {
