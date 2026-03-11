@@ -1,24 +1,6 @@
-import { DJCard } from "@/components/about/DJCard";
-import { getSupabaseServerClient } from "@/lib/supabase";
-import type { DJRow } from "@/lib/supabase";
-
 export const revalidate = 3600;
 
 export default async function AboutPage() {
-  let djs: DJRow[] = [];
-
-  try {
-    const supabase = getSupabaseServerClient();
-    const { data } = await supabase
-      .from("djs")
-      .select("*")
-      .order("is_resident", { ascending: false })
-      .order("name");
-    djs = (data as DJRow[]) ?? [];
-  } catch {
-    // Supabase not configured yet — show empty state
-  }
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       {/* About NR1 */}
@@ -86,28 +68,23 @@ export default async function AboutPage() {
             </a>
           </div>
         </div>
+
+        {/* Meet the team */}
+        <div className="mt-8 rounded-xl border border-white/10 bg-nr1-grey p-5 flex items-center justify-between gap-4">
+          <div>
+            <h3 className="font-heading text-xl text-white mb-1">Meet the Team</h3>
+            <p className="text-sm text-white/60">30+ DJs and MCs — see the full crew on our main site.</p>
+          </div>
+          <a
+            href="https://nr1dnb.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 px-4 py-2 rounded-lg border border-nr1-cyan/30 bg-nr1-cyan/5 font-mono text-sm text-nr1-cyan hover:border-nr1-cyan/60 transition-colors"
+          >
+            nr1dnb.com →
+          </a>
+        </div>
       </section>
-
-      {/* DJs */}
-      {djs.length > 0 && (
-        <section>
-          <div className="section-heading-rule mb-8">
-            <h2 className="font-heading text-4xl sm:text-5xl text-white tracking-wide">Our DJs</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {djs.map((dj) => (
-              <DJCard key={dj.id} dj={dj} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {djs.length === 0 && (
-        <section>
-          <h2 className="font-heading text-4xl sm:text-5xl text-white tracking-wide mb-4">Our DJs</h2>
-          <p className="font-mono text-nr1-muted">DJ profiles coming soon.</p>
-        </section>
-      )}
     </div>
   );
 }
