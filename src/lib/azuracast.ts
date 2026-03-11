@@ -122,8 +122,8 @@ export async function getSchedule(): Promise<ScheduleEntry[]> {
 }
 
 export function getStreamUrl(): string {
-  // Use the proxied /stream path to avoid mixed-content blocking on HTTPS
-  if (typeof window !== "undefined") return "/stream";
+  // Use the Edge proxy to avoid mixed-content blocking on HTTPS
+  if (typeof window !== "undefined") return "/api/stream";
   return `${BASE_URL}/listen/${STATION_SHORTCODE}/radio.mp3`;
 }
 
