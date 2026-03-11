@@ -20,7 +20,6 @@ export function NowPlayingCard({ track, artist, artwork }: NowPlayingCardProps) 
             alt={`${artist} - ${track}`}
             fill
             className="object-cover"
-            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

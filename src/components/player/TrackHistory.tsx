@@ -1,6 +1,7 @@
 "use client";
 
 import type { HistoryEntry } from "@/lib/azuracast";
+import { cleanTitle } from "@/lib/azuracast";
 
 interface TrackHistoryProps {
   history: HistoryEntry[];
@@ -31,7 +32,7 @@ export function TrackHistory({ history }: TrackHistoryProps) {
             </span>
             <div className="min-w-0">
               <span className="text-xs text-nr1-cyan font-mono truncate block">{entry.song.artist}</span>
-              <span className="text-xs text-white truncate block">{entry.song.title}</span>
+              <span className="text-xs text-white truncate block">{cleanTitle(entry.song.title)}</span>
             </div>
           </div>
         ))}

@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "radio.nr1dnb.com",
+        hostname: "radio.listen-nr1dnb.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "radio.listen-nr1dnb.com",
         pathname: "/**",
       },
       {

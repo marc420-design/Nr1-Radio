@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ?? "http://192.168.0.224";
+const BASE_URL = process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ?? "http://radio.listen-nr1dnb.com";
 const STATION_ID = process.env.NEXT_PUBLIC_STATION_ID ?? "nr1_dnb_radio";
 
 export const dynamic = "force-dynamic";

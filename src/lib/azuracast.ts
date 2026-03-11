@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ?? "https://radio.nr1dnb.com";
+const BASE_URL = process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ?? "http://radio.listen-nr1dnb.com";
 const STATION_ID = process.env.NEXT_PUBLIC_STATION_ID ?? "nr1dnb";
 const STATION_SHORTCODE = process.env.NEXT_PUBLIC_STATION_SHORTCODE ?? "nr1dnb";
 
@@ -135,3 +135,12 @@ export function createSSEConnection(shortcode: string): EventSource | null {
 }
 
 export const STATION_SHORTCODE_VALUE = STATION_SHORTCODE;
+
+// Strip AzuraCast internal IDs and station tags from song titles
+// e.g. "kaiden 5 hour special [sx0iguhcpa4] nr1" → "kaiden 5 hour special"
+export function cleanTitle(title: string): string {
+  return title
+    .replace(/\s*\[[^\]]+\]/g, "")   // remove [anything]
+    .replace(/\s+nr1\s*$/i, "")       // remove trailing "nr1"
+    .trim();
+}

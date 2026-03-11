@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { NowPlayingData, HistoryEntry } from "@/lib/azuracast";
+import { cleanTitle } from "@/lib/azuracast";
 
 interface NowPlayingState {
   track: string;
@@ -27,7 +28,7 @@ const DEFAULT_STATE: NowPlayingState = {
 
 function parseNowPlaying(data: NowPlayingData): NowPlayingState {
   return {
-    track: data.now_playing?.song.title ?? "",
+    track: cleanTitle(data.now_playing?.song.title ?? ""),
     artist: data.now_playing?.song.artist ?? "",
     artwork: data.now_playing?.song.art ?? "",
     isLive: data.live.is_live,
