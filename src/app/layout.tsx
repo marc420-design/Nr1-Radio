@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "NR1 DNB Radio",
     description: "Norwich's finest drum & bass radio station. Listen live 24/7.",
     type: "website",
-    url: "https://listen-nr1radio.com",
+    url: "https://listen-nr1dnb.com",
   },
   twitter: {
     card: "summary_large_image",
