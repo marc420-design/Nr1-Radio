@@ -78,6 +78,9 @@ export default function RootLayout({
                 <Link href="/about" className="px-3 py-1.5 text-xs font-mono text-nr1-muted hover:text-nr1-cyan hover:bg-nr1-cyan/5 rounded transition-colors">
                   About
                 </Link>
+                <Link href="/listen" className="px-3 py-1.5 text-xs font-mono text-nr1-cyan bg-nr1-cyan/10 hover:bg-nr1-cyan/20 rounded transition-colors">
+                  Listen
+                </Link>
               </div>
             </div>
           </div>

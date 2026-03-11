@@ -76,12 +76,12 @@ export default async function AboutPage() {
             <p className="text-sm text-white/60">30+ DJs and MCs — see the full crew on our main site.</p>
           </div>
           <a
-            href="https://nr1dnb.com"
+            href="https://listen-nr1dnb.com"
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 px-4 py-2 rounded-lg border border-nr1-cyan/30 bg-nr1-cyan/5 font-mono text-sm text-nr1-cyan hover:border-nr1-cyan/60 transition-colors"
           >
-            nr1dnb.com →
+            listen-nr1dnb.com →
           </a>
         </div>
       </section>
