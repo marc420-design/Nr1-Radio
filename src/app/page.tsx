@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { TrackHistory } from "@/components/player/TrackHistory";
 import { ExternalPlayerLink } from "@/components/ui/ExternalPlayerLink";
@@ -14,9 +15,16 @@ export default async function HomePage() {
       <section className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="font-heading text-7xl sm:text-9xl text-white tracking-widest leading-none">
-            NR1
-          </h1>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/icons/icon-512.png"
+              alt="NR1 DNB Radio"
+              width={180}
+              height={180}
+              priority
+              className="drop-shadow-[0_0_30px_rgba(0,229,255,0.2)]"
+            />
+          </div>
           <p className="font-heading text-2xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
             DNB RADIO
           </p>

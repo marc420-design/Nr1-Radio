@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Space_Mono, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -63,8 +64,9 @@ export default function RootLayout({
         <nav className="sticky top-0 z-40 bg-nr1-black/80 backdrop-blur-md border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <Link href="/" className="font-heading text-2xl text-nr1-cyan tracking-widest hover:text-white transition-colors">
-                NR1 DNB
+              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <Image src="/icons/icon-192.png" alt="NR1 DNB" width={32} height={32} className="rounded-sm" />
+                <span className="font-heading text-2xl text-nr1-cyan tracking-widest">NR1 DNB</span>
               </Link>
               <div className="flex items-center gap-6">
                 <Link href="/schedule" className="text-sm font-mono text-nr1-muted hover:text-nr1-cyan transition-colors">
