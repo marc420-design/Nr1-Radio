@@ -96,13 +96,15 @@ export default function RootLayout({
                 © {new Date().getFullYear()} NR1 DNB Radio · Norwich, UK
               </p>
               <div className="flex items-center gap-4 text-xs font-mono text-nr1-muted">
-                <a href="mailto:demos@nr1dnb.com" className="hover:text-nr1-cyan transition-colors">
-                  Submit Demo
-                </a>
+                <a href="https://www.facebook.com/nr1dnb" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">Facebook</a>
                 <span>·</span>
-                <a href="mailto:bookings@nr1dnb.com" className="hover:text-nr1-cyan transition-colors">
-                  Bookings
-                </a>
+                <a href="https://youtube.com/@nr1family420" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">YouTube</a>
+                <span>·</span>
+                <a href="https://www.mixcloud.com/Nr1family/" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">Mixcloud</a>
+                <span>·</span>
+                <a href="https://soundcloud.com/nr1-family" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">SoundCloud</a>
+                <span>·</span>
+                <a href="mailto:Nr1family420@gmail.com" className="hover:text-nr1-cyan transition-colors">Contact</a>
               </div>
             </div>
           </div>
