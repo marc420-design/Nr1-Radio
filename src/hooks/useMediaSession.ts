@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-interface MediaSessionProps {
+interface UseMediaSessionProps {
   track: string;
   artist: string;
   artwork: string;
@@ -11,33 +11,64 @@ interface MediaSessionProps {
   onPause: () => void;
 }
 
-export function useMediaSession({ track, artist, artwork, isPlaying, onPlay, onPause }: MediaSessionProps) {
+/**
+ * Hook to integrate with the Media Session API for lock screen controls.
+ * Updates metadata when track changes and handles play/pause actions from
+ * system media controls (lock screen, notification center, headphone buttons).
+ */
+export function useMediaSession({
+  track,
+  artist,
+  artwork,
+  isPlaying,
+  onPlay,
+  onPause,
+}: UseMediaSessionProps) {
   useEffect(() => {
-    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    // Media Session API is only available in browsers
+    if (typeof window === "undefined" || !("mediaSession" in navigator)) {
+      return;
+    }
 
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track || "NR1 DNB Radio",
-      artist: artist || "Live Stream",
-      album: "NR1 DNB Radio",
-      artwork: artwork
-        ? [{ src: artwork, sizes: "512x512", type: "image/jpeg" }]
-        : [{ src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" }],
+    // Update metadata whenever track info changes
+    if (track || artist) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track || "NR1 DNB Radio",
+        artist: artist || "Live Stream",
+        album: "NR1 Drum & Bass Radio",
+        artwork: [
+          {
+            src: artwork || "/icons/icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: artwork || "/icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      });
+    }
+
+    // Set up action handlers for media controls
+    navigator.mediaSession.setActionHandler("play", () => {
+      onPlay();
     });
-  }, [track, artist, artwork]);
 
-  useEffect(() => {
-    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    navigator.mediaSession.setActionHandler("pause", () => {
+      onPause();
+    });
 
+    // Update playback state
     navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
 
-    navigator.mediaSession.setActionHandler("play", onPlay);
-    navigator.mediaSession.setActionHandler("pause", onPause);
-    navigator.mediaSession.setActionHandler("stop", onPause);
-
+    // Cleanup: reset handlers when component unmounts
     return () => {
-      navigator.mediaSession.setActionHandler("play", null);
-      navigator.mediaSession.setActionHandler("pause", null);
-      navigator.mediaSession.setActionHandler("stop", null);
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler("play", null);
+        navigator.mediaSession.setActionHandler("pause", null);
+      }
     };
-  }, [isPlaying, onPlay, onPause]);
+  }, [track, artist, artwork, isPlaying, onPlay, onPause]);
 }

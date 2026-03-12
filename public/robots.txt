@@ -1,0 +1,11 @@
+# robots.txt for NR1 DNB Radio
+# https://listen-nr1dnb.com
+
+User-agent: *
+Allow: /
+
+# Disallow admin/api routes
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://listen-nr1dnb.com/sitemap.xml
