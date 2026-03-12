@@ -3,6 +3,7 @@ import { PlayerBar } from "@/components/player/PlayerBar";
 import { TrackHistory } from "@/components/player/TrackHistory";
 import { ExternalPlayerLink } from "@/components/ui/ExternalPlayerLink";
 import { getNowPlaying } from "@/lib/azuracast";
+import { STAT_BADGES } from "@/lib/constants";
 
 export const revalidate = 15;
 
@@ -39,9 +40,9 @@ export default async function HomePage() {
 
           {/* Stat badges */}
           <div className="relative z-10 flex flex-wrap justify-center gap-2 mt-4">
-            <span className="stat-badge">30+ DJs</span>
-            <span className="stat-badge">Est. 2018</span>
-            <span className="stat-badge">Norwich, UK</span>
+            {STAT_BADGES.map((badge) => (
+              <span key={badge} className="stat-badge">{badge}</span>
+            ))}
           </div>
         </div>
 

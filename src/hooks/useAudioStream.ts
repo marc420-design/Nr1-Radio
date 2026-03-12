@@ -70,6 +70,7 @@ export function useAudioStream(): UseAudioStreamReturn {
       audioRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // intentionally empty — audio element is created once on mount
   }, []);
 
   function scheduleRetry() {
@@ -127,6 +128,11 @@ export function useAudioStream(): UseAudioStreamReturn {
     if (!audio) return;
     const next = !audio.muted;
     audio.muted = next;
+    // If unmuting while volume is 0, restore to a sensible default
+    if (!next && audio.volume === 0) {
+      audio.volume = 0.8;
+      setVolumeState(0.8);
+    }
     setIsMuted(next);
   }, []);
 

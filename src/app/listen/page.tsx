@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { PlayerBar } from "@/components/player/PlayerBar";
+import { DIRECT_STREAM_URL, SOCIAL_LINKS } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Listen — NR1 DNB Radio",
   description: "Listen live to NR1 DNB Radio on Alexa, TuneIn, or in your browser. Norwich's finest drum & bass station.",
 };
-
-const STREAM_URL = "https://radio.listen-nr1dnb.com/listen/nr1_dnb_radio/radio.mp3";
 
 export default function ListenPage() {
   return (
@@ -84,10 +83,10 @@ export default function ListenPage() {
               Copy the stream URL into any media player — VLC, foobar2000, Winamp, etc.
             </p>
             <a
-              href={STREAM_URL}
+              href={DIRECT_STREAM_URL}
               className="inline-block font-mono text-xs text-nr1-cyan break-all hover:underline"
             >
-              {STREAM_URL}
+              {DIRECT_STREAM_URL}
             </a>
           </div>
 
@@ -98,7 +97,7 @@ export default function ListenPage() {
               Catch up on recorded sets from our resident DJs.
             </p>
             <a
-              href="https://www.mixcloud.com/Nr1family/"
+              href={SOCIAL_LINKS.mixcloud}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block font-mono text-xs text-nr1-cyan hover:underline"
@@ -114,7 +113,7 @@ export default function ListenPage() {
               Full set archives and live Friday session recordings.
             </p>
             <a
-              href="https://youtube.com/@nr1family420"
+              href={SOCIAL_LINKS.youtube}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block font-mono text-xs text-nr1-cyan hover:underline"
@@ -157,7 +156,7 @@ export default function ListenPage() {
           your browser. Follow us on Facebook for session announcements.
         </p>
         <a
-          href="https://www.facebook.com/nr1dnb"
+          href={SOCIAL_LINKS.facebook}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block font-mono text-xs text-nr1-crimson hover:underline"

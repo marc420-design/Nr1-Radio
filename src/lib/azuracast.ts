@@ -1,6 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ?? "http://radio.listen-nr1dnb.com";
-const STATION_ID = process.env.NEXT_PUBLIC_STATION_ID ?? "nr1dnb";
-const STATION_SHORTCODE = process.env.NEXT_PUBLIC_STATION_SHORTCODE ?? "nr1dnb";
+import { AZURACAST_BASE_URL as BASE_URL, STATION_ID, STATION_SHORTCODE } from "./constants";
 
 export interface NowPlayingData {
   station: {
@@ -94,7 +92,7 @@ async function apiFetch<T>(path: string): Promise<T> {
     headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`AzuraCast API error: ${res.status}`);
-  return res.json() as Promise<T>;
+  return res.json();
 }
 
 export async function getNowPlaying(): Promise<NowPlayingData> {
@@ -130,7 +128,7 @@ export function getStreamUrl(): string {
 export function createSSEConnection(shortcode: string): EventSource | null {
   if (typeof window === "undefined") return null;
   try {
-    return new EventSource(`${BASE_URL}/api/live/nowplaying/${shortcode}`);
+    return new EventSource(`/api/sse?shortcode=${encodeURIComponent(shortcode)}`);
   } catch {
     return null;
   }

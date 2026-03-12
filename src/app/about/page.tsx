@@ -1,3 +1,5 @@
+import { SOCIAL_LINKS } from "@/lib/constants";
+
 export const revalidate = 3600;
 
 export default async function AboutPage() {
@@ -29,10 +31,10 @@ export default async function AboutPage() {
         {/* Socials */}
         <div className="mt-8 flex flex-wrap gap-3">
           {[
-            { label: "Facebook", href: "https://www.facebook.com/nr1dnb" },
-            { label: "YouTube", href: "https://youtube.com/@nr1family420" },
-            { label: "Mixcloud", href: "https://www.mixcloud.com/Nr1family/" },
-            { label: "SoundCloud", href: "https://soundcloud.com/nr1-family" },
+            { label: "Facebook",   href: SOCIAL_LINKS.facebook },
+            { label: "YouTube",    href: SOCIAL_LINKS.youtube },
+            { label: "Mixcloud",   href: SOCIAL_LINKS.mixcloud },
+            { label: "SoundCloud", href: SOCIAL_LINKS.soundcloud },
           ].map((s) => (
             <a
               key={s.label}
@@ -51,20 +53,20 @@ export default async function AboutPage() {
             <h3 className="font-heading text-xl text-nr1-cyan mb-2">Submit a Demo</h3>
             <p className="text-sm text-white/60 mb-3">Got a mix or original track? We want to hear it.</p>
             <a
-              href="mailto:Nr1family420@gmail.com"
+              href={`mailto:${SOCIAL_LINKS.email}`}
               className="text-sm font-mono text-nr1-cyan hover:underline"
             >
-              Nr1family420@gmail.com →
+              {SOCIAL_LINKS.email} →
             </a>
           </div>
           <div className="rounded-xl border border-white/10 bg-nr1-grey p-5">
             <h3 className="font-heading text-xl text-nr1-cyan mb-2">Bookings & Press</h3>
             <p className="text-sm text-white/60 mb-3">For show bookings, sponsorship, or press enquiries.</p>
             <a
-              href="mailto:Nr1family420@gmail.com"
+              href={`mailto:${SOCIAL_LINKS.email}`}
               className="text-sm font-mono text-nr1-cyan hover:underline"
             >
-              Nr1family420@gmail.com →
+              {SOCIAL_LINKS.email} →
             </a>
           </div>
         </div>
@@ -73,15 +75,13 @@ export default async function AboutPage() {
         <div className="mt-8 rounded-xl border border-white/10 bg-nr1-grey p-5 flex items-center justify-between gap-4">
           <div>
             <h3 className="font-heading text-xl text-white mb-1">Meet the Team</h3>
-            <p className="text-sm text-white/60">30+ DJs and MCs — see the full crew on our main site.</p>
+            <p className="text-sm text-white/60">30+ DJs and MCs — see the full crew.</p>
           </div>
           <a
-            href="https://listen-nr1dnb.com"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/djs"
             className="shrink-0 px-4 py-2 rounded-lg border border-nr1-cyan/30 bg-nr1-cyan/5 font-mono text-sm text-nr1-cyan hover:border-nr1-cyan/60 transition-colors"
           >
-            listen-nr1dnb.com →
+            View the crew →
           </a>
         </div>
       </section>

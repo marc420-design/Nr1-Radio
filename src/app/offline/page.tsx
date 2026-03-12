@@ -1,4 +1,4 @@
-"use client";
+import Link from "next/link";
 
 export default function OfflinePage() {
   return (
@@ -11,12 +11,12 @@ export default function OfflinePage() {
           Check your internet connection and try again. The stream will resume automatically
           once you&apos;re back online.
         </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-6 py-3 rounded-lg bg-nr1-grey border border-white/10 font-mono text-sm text-nr1-cyan hover:border-nr1-cyan/30 transition-colors"
+        <Link
+          href="/"
+          className="inline-block px-6 py-3 rounded-lg bg-nr1-grey border border-white/10 font-mono text-sm text-nr1-cyan hover:border-nr1-cyan/30 transition-colors"
         >
           Try again
-        </button>
+        </Link>
       </div>
     </div>
   );

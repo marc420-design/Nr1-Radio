@@ -1,11 +1,7 @@
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ??
-  "http://radio.listen-nr1dnb.com";
-const SHORTCODE =
-  process.env.NEXT_PUBLIC_STATION_SHORTCODE ?? "nr1_dnb_radio";
+import { AZURACAST_BASE_URL as BASE_URL, STATION_SHORTCODE as SHORTCODE } from "@/lib/constants";
 
 export async function GET(req: Request) {
   const url = `${BASE_URL}/listen/${SHORTCODE}/radio.mp3`;

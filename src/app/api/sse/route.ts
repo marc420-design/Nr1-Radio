@@ -1,7 +1,5 @@
 import { NextRequest } from "next/server";
-
-const BASE_URL = process.env.NEXT_PUBLIC_AZURACAST_BASE_URL ?? "http://radio.listen-nr1dnb.com";
-const STATION_SHORTCODE = process.env.NEXT_PUBLIC_STATION_SHORTCODE ?? "nr1_dnb_radio";
+import { AZURACAST_BASE_URL as BASE_URL, STATION_SHORTCODE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 

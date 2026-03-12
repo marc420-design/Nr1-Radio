@@ -3,6 +3,9 @@ import { Bebas_Neue, Space_Mono, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
+import { NavLinks } from "@/components/ui/NavLinks";
+import { SOCIAL_LINKS } from "@/lib/constants";
+import { STATION_META } from "@/lib/station";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -26,23 +29,32 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "NR1 DNB Radio — Live Drum & Bass",
-  description: "Norwich's finest drum & bass radio station. Listen live 24/7.",
+  title: `${STATION_META.name} — Live Drum & Bass`,
+  description: STATION_META.description,
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/icon-192.png",
     apple: "/icons/icon-192.png",
   },
   openGraph: {
-    title: "NR1 DNB Radio",
-    description: "Norwich's finest drum & bass radio station. Listen live 24/7.",
+    title: STATION_META.name,
+    description: STATION_META.description,
     type: "website",
-    url: "https://listen-nr1dnb.com",
+    url: STATION_META.siteUrl,
+    images: [
+      {
+        url: STATION_META.logoUrl,
+        width: 512,
+        height: 512,
+        alt: STATION_META.name,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NR1 DNB Radio",
-    description: "Norwich's finest drum & bass radio station. Listen live 24/7.",
+    title: STATION_META.name,
+    description: STATION_META.description,
+    images: [STATION_META.logoUrl],
   },
 };
 
@@ -68,20 +80,7 @@ export default function RootLayout({
                 <Image src="/icons/icon-192.png" alt="NR1 DNB" width={28} height={28} className="rounded-sm" />
                 <span className="font-heading text-2xl text-nr1-cyan tracking-widest">NR1 DNB</span>
               </Link>
-              <div className="flex items-center gap-1 pl-4 border-l border-white/10">
-                <Link href="/schedule" className="px-3 py-1.5 text-xs font-mono text-nr1-muted hover:text-nr1-cyan hover:bg-nr1-cyan/5 rounded transition-colors">
-                  Schedule
-                </Link>
-                <Link href="/events" className="px-3 py-1.5 text-xs font-mono text-nr1-muted hover:text-nr1-cyan hover:bg-nr1-cyan/5 rounded transition-colors">
-                  Events
-                </Link>
-                <Link href="/about" className="px-3 py-1.5 text-xs font-mono text-nr1-muted hover:text-nr1-cyan hover:bg-nr1-cyan/5 rounded transition-colors">
-                  About
-                </Link>
-                <Link href="/listen" className="px-3 py-1.5 text-xs font-mono text-nr1-cyan bg-nr1-cyan/10 hover:bg-nr1-cyan/20 rounded transition-colors">
-                  Listen
-                </Link>
-              </div>
+              <NavLinks />
             </div>
           </div>
         </nav>
@@ -92,22 +91,22 @@ export default function RootLayout({
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-nr1-cyan/20 py-8 mt-16" style={{ boxShadow: "0 -1px 0 0 rgba(0,229,255,0.08)" }}>
+        <footer className="footer-top-shadow border-t border-nr1-cyan/20 py-8 mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs font-mono text-nr1-muted">
                 © {new Date().getFullYear()} NR1 DNB Radio · Norwich, UK
               </p>
               <div className="flex items-center gap-4 text-xs font-mono text-nr1-muted">
-                <a href="https://www.facebook.com/nr1dnb" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">Facebook</a>
+                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">Facebook</a>
                 <span>·</span>
-                <a href="https://youtube.com/@nr1family420" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">YouTube</a>
+                <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">YouTube</a>
                 <span>·</span>
-                <a href="https://www.mixcloud.com/Nr1family/" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">Mixcloud</a>
+                <a href={SOCIAL_LINKS.mixcloud} target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">Mixcloud</a>
                 <span>·</span>
-                <a href="https://soundcloud.com/nr1-family" target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">SoundCloud</a>
+                <a href={SOCIAL_LINKS.soundcloud} target="_blank" rel="noopener noreferrer" className="hover:text-nr1-cyan transition-colors">SoundCloud</a>
                 <span>·</span>
-                <a href="mailto:Nr1family420@gmail.com" className="hover:text-nr1-cyan transition-colors">Contact</a>
+                <a href={`mailto:${SOCIAL_LINKS.email}`} className="hover:text-nr1-cyan transition-colors">Contact</a>
               </div>
             </div>
           </div>
@@ -136,6 +135,62 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         )}
+
+        {/* JSON-LD structured data — RadioBroadcastService */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "RadioBroadcastService",
+              name: STATION_META.name,
+              alternateName: STATION_META.shortName,
+              description: STATION_META.description,
+              url: STATION_META.siteUrl,
+              broadcastDisplayName: STATION_META.name,
+              logo: {
+                "@type": "ImageObject",
+                url: STATION_META.logoUrl,
+                width: 512,
+                height: 512,
+              },
+              broadcastAffiliateOf: {
+                "@type": "Organization",
+                name: STATION_META.name,
+                foundingDate: STATION_META.founded,
+                location: {
+                  "@type": "Place",
+                  name: `${STATION_META.city}, ${STATION_META.region}, ${STATION_META.country}`,
+                  address: {
+                    "@type": "PostalAddress",
+                    addressLocality: STATION_META.city,
+                    addressRegion: STATION_META.region,
+                    addressCountry: STATION_META.countryCode,
+                  },
+                },
+              },
+              potentialAction: {
+                "@type": "ListenAction",
+                target: [
+                  {
+                    "@type": "EntryPoint",
+                    urlTemplate: STATION_META.siteUrl,
+                    actionPlatform: [
+                      "http://schema.org/DesktopWebPlatform",
+                      "http://schema.org/MobileWebPlatform",
+                    ],
+                  },
+                ],
+              },
+              sameAs: [
+                STATION_META.social.facebook,
+                STATION_META.social.youtube,
+                STATION_META.social.mixcloud,
+                STATION_META.social.soundcloud,
+              ],
+            }),
+          }}
+        />
       </body>
     </html>
   );
