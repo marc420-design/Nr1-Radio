@@ -11,6 +11,7 @@ interface NowPlayingState {
   isLive: boolean;
   streamerName: string;
   listenerCount: number;
+  uniqueListeners: number;
   history: HistoryEntry[];
   isOnline: boolean;
 }
@@ -22,6 +23,7 @@ const DEFAULT_STATE: NowPlayingState = {
   isLive: false,
   streamerName: "",
   listenerCount: 0,
+  uniqueListeners: 0,
   history: [],
   isOnline: false,
 };
@@ -34,6 +36,7 @@ function parseNowPlaying(data: NowPlayingData): NowPlayingState {
     isLive: data.live.is_live,
     streamerName: data.live.streamer_name,
     listenerCount: data.listeners.current,
+    uniqueListeners: data.listeners.unique,
     history: data.song_history ?? [],
     isOnline: data.is_online,
   };
@@ -43,7 +46,6 @@ export function useNowPlaying(): NowPlayingState {
   const [state, setState] = useState<NowPlayingState>(DEFAULT_STATE);
   const sseRef = useRef<EventSource | null>(null);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const sseFailedRef = useRef(false);
 
   const poll = useCallback(async () => {
     try {
@@ -87,11 +89,7 @@ export function useNowPlaying(): NowPlayingState {
     };
 
     sse.onerror = () => {
-      if (!sseFailedRef.current) {
-        sseFailedRef.current = true;
-        // SSE failed — fall back to polling
-        startPolling();
-      }
+      startPolling(); // startPolling() already guards against double-start
     };
 
     // Do an immediate poll so we have data before SSE kicks in

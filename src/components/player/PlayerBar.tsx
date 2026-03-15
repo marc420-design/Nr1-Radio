@@ -1,53 +1,51 @@
 "use client";
 
-import { useAudioStream } from "@/hooks/useAudioStream";
-import { useNowPlaying } from "@/hooks/useNowPlaying";
-import { useMediaSession } from "@/hooks/useMediaSession";
+import { usePlayer } from "@/contexts/PlayerContext";
 import { PlayPauseButton } from "./PlayPauseButton";
 import { NowPlayingCard } from "./NowPlayingCard";
 import { LiveBadge } from "./LiveBadge";
 import { VolumeControl } from "./VolumeControl";
 import { EqualizerBars } from "./EqualizerBars";
+import { ShareButton } from "@/components/ui/ShareButton";
 
+/**
+ * Desktop hero player card — shown inline on the homepage and listen page.
+ * Audio state is shared via PlayerContext so navigating away doesn't kill the stream.
+ * The persistent sticky bottom bar (StickyPlayer) is rendered in the root layout.
+ */
 export function PlayerBar() {
-  const { play, pause, setVolume, toggleMute, isPlaying, isMuted, volume, status } = useAudioStream();
-  const { track, artist, artwork, isLive, isOnline } = useNowPlaying();
-
-  useMediaSession({ track, artist, artwork, isPlaying, onPlay: play, onPause: pause });
+  const { play, pause, setVolume, toggleMute, isPlaying, isMuted, volume, status, track, artist, artwork, isLive, isOnline, listenerCount, uniqueListeners } = usePlayer();
 
   return (
-    <>
-      {/* Mobile: fixed bottom bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-nr1-grey/95 backdrop-blur-md border-t border-nr1-cyan/20 mobile-bar-glow px-4 py-3">
-        <div className="flex items-center gap-3">
-          <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
-          <div className="flex-1 min-w-0">
-            <NowPlayingCard track={track} artist={artist} artwork={artwork} />
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
-            <EqualizerBars isPlaying={isPlaying} />
-          </div>
+    <div className="flex justify-center w-full">
+      <div className="player-card flex flex-col items-center gap-6 py-10 px-12 w-full max-w-md">
+        <div className="flex items-center gap-4">
+          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
+          <EqualizerBars isPlaying={isPlaying} />
         </div>
-      </div>
-
-      {/* Desktop: hero section (rendered inline, not fixed) */}
-      <div className="hidden lg:flex justify-center w-full">
-        <div className="player-card flex flex-col items-center gap-6 py-10 px-12 w-full max-w-md">
-          <div className="flex items-center gap-4">
-            <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
-            <EqualizerBars isPlaying={isPlaying} />
-          </div>
-          <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
-          <NowPlayingCard track={track} artist={artist} artwork={artwork} />
-          <VolumeControl
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={setVolume}
-            onToggleMute={toggleMute}
+        <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
+        <NowPlayingCard track={track} artist={artist} artwork={artwork} />
+        {listenerCount > 0 && (
+          <p className="text-xs font-mono text-nr1-muted">
+            {listenerCount} listening right now
+            {uniqueListeners > listenerCount && ` • ${uniqueListeners} tuned in today`}
+          </p>
+        )}
+        {track && artist && (
+          <ShareButton
+            title="NR1 DNB Radio"
+            text={`Listening to ${artist} - ${track} on NR1 DNB Radio 🎵 listen.nr1dnb.com`}
+            url="https://listen.nr1dnb.com"
+            label="Share track"
           />
-        </div>
+        )}
+        <VolumeControl
+          volume={volume}
+          isMuted={isMuted}
+          onVolumeChange={setVolume}
+          onToggleMute={toggleMute}
+        />
       </div>
-    </>
+    </div>
   );
 }

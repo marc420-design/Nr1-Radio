@@ -8,7 +8,6 @@ export async function GET(_req: NextRequest) {
 
   try {
     const upstream = await fetch(upstreamUrl, {
-      signal: AbortSignal.timeout(60_000),
       headers: { Accept: "text/event-stream" },
     });
 
