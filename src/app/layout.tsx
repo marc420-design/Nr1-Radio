@@ -8,6 +8,7 @@ import { SOCIAL_LINKS } from "@/lib/constants";
 import { STATION_META } from "@/lib/station";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import { StickyPlayer } from "@/components/player/StickyPlayer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -90,7 +91,7 @@ export default function RootLayout({
 
         {/* Page content — bottom padding clears the sticky player bar */}
         <main className="pb-20">
-          {children}
+          <ErrorBoundary>{children}</ErrorBoundary>
         </main>
 
         {/* Persistent player — always visible across all pages */}

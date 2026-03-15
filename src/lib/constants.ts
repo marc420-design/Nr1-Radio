@@ -22,5 +22,8 @@ export const SOCIAL_LINKS = {
   email:      "Nr1family420@gmail.com",
 } as const;
 
+// ─── Player settings ──────────────────────────────────────────────────────────
+export const TRACK_HISTORY_LIMIT = 8;
+
 // ─── Home page stat badges ────────────────────────────────────────────────────
 export const STAT_BADGES = ["30+ DJs", "Est. 2018", "Norwich, UK"] as const;

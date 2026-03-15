@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-const EMBED_CODE = `<iframe src="https://listen.nr1dnb.com/embed" width="340" height="200"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://listen-nr1dnb.com";
+const EMBED_CODE = `<iframe src="${SITE_URL}/embed" width="340" height="200"
   frameborder="0" allow="autoplay" title="NR1 DNB Radio"></iframe>`;
 
 export function EmbedCodeSnippet() {
