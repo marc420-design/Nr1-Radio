@@ -10,6 +10,8 @@ export async function GET(req: Request) {
     const upstream = await fetch(url, {
       signal: req.signal,
       headers: { "Icy-MetaData": "0" },
+      // Keep connection alive for long-lived radio stream
+      cache: "no-store",
     });
 
     if (!upstream.ok || !upstream.body) {

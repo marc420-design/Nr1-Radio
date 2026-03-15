@@ -6,6 +6,8 @@ import Image from "next/image";
 import { NavLinks } from "@/components/ui/NavLinks";
 import { SOCIAL_LINKS } from "@/lib/constants";
 import { STATION_META } from "@/lib/station";
+import { PlayerProvider } from "@/contexts/PlayerContext";
+import { StickyPlayer } from "@/components/player/StickyPlayer";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -72,6 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${bebasNeue.variable} ${spaceMono.variable} ${dmSans.variable}`}>
       <body className="bg-nr1-black text-white font-body antialiased min-h-screen">
+        <PlayerProvider>
         {/* Navigation */}
         <nav className="sticky top-0 z-40 bg-nr1-black/85 backdrop-blur-md border-b border-nr1-cyan/15">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,10 +88,13 @@ export default function RootLayout({
           </div>
         </nav>
 
-        {/* Page content */}
-        <main className="pb-24 lg:pb-0">
+        {/* Page content — bottom padding clears the sticky player bar */}
+        <main className="pb-20">
           {children}
         </main>
+
+        {/* Persistent player — always visible across all pages */}
+        <StickyPlayer />
 
         {/* Footer */}
         <footer className="footer-top-shadow border-t border-nr1-cyan/20 py-8 mt-16">
@@ -135,6 +141,8 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         )}
+
+        </PlayerProvider>
 
         {/* JSON-LD structured data — RadioBroadcastService */}
         <script

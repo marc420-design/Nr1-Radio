@@ -46,8 +46,10 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Player */}
-        <PlayerBar />
+        {/* Desktop hero player — mobile uses the persistent StickyPlayer */}
+        <div className="hidden lg:block w-full">
+          <PlayerBar />
+        </div>
 
         {/* External player link */}
         <div className="mt-4 lg:mt-2">
