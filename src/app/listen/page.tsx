@@ -89,11 +89,11 @@ export default function ListenPage() {
 
         <div className="grid sm:grid-cols-2 gap-4">
 
-          {/* TuneIn */}
+          {/* Radio directories */}
           <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-2">
-            <p className="font-heading text-lg text-nr1-cyan tracking-widest">TUNEIN</p>
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO APPS</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
-              Available on TuneIn — works on Alexa, Google Home, Sonos, Bose, and the TuneIn app.
+              Find us on MyTuner Radio, Online Radio Box, Streema, Radio Browser, and more — search "NR1 DNB Radio".
             </p>
           </div>
 
@@ -147,23 +147,23 @@ export default function ListenPage() {
 
       {/* Smart speakers section */}
       <section className="space-y-4">
-        <h2 className="font-heading text-2xl text-white tracking-widest">SMART SPEAKERS</h2>
+        <h2 className="font-heading text-2xl text-white tracking-widest">SMART SPEAKERS &amp; HARDWARE</h2>
         <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-6">
           <div className="grid sm:grid-cols-3 gap-6 text-center">
             <div className="space-y-1">
               <p className="font-heading text-xl text-nr1-cyan tracking-widest">AMAZON ALEXA</p>
               <p className="font-mono text-xs text-nr1-muted">Echo · Echo Dot · Fire TV</p>
-              <p className="font-mono text-xs text-white/60">Via TuneIn</p>
+              <p className="font-mono text-xs text-white/60">"Alexa, open nr one radio"</p>
             </div>
             <div className="space-y-1">
-              <p className="font-heading text-xl text-nr1-cyan tracking-widest">GOOGLE HOME</p>
-              <p className="font-mono text-xs text-nr1-muted">Nest · Hub · Mini</p>
-              <p className="font-mono text-xs text-white/60">Via TuneIn</p>
+              <p className="font-heading text-xl text-nr1-cyan tracking-widest">INTERNET RADIOS</p>
+              <p className="font-mono text-xs text-nr1-muted">Pure · Roberts · Yamaha · Denon</p>
+              <p className="font-mono text-xs text-white/60">Via vTuner</p>
             </div>
             <div className="space-y-1">
-              <p className="font-heading text-xl text-nr1-cyan tracking-widest">SONOS / BOSE</p>
-              <p className="font-mono text-xs text-nr1-muted">All Sonos & Bose devices</p>
-              <p className="font-mono text-xs text-white/60">Via TuneIn</p>
+              <p className="font-heading text-xl text-nr1-cyan tracking-widest">RADIO APPS</p>
+              <p className="font-mono text-xs text-nr1-muted">MyTuner · Online Radio Box · Streema</p>
+              <p className="font-mono text-xs text-white/60">Search "NR1 DNB Radio"</p>
             </div>
           </div>
         </div>
@@ -195,53 +195,55 @@ export default function ListenPage() {
         <EmbedCodeSnippet />
       </section>
 
-      {/* Get listed */}
+      {/* Where to find us */}
       <section className="space-y-4">
-        <h2 className="font-heading text-2xl text-white tracking-widest">GET LISTED</h2>
+        <h2 className="font-heading text-2xl text-white tracking-widest">FIND US ON</h2>
         <p className="font-mono text-xs text-nr1-muted leading-relaxed">
-          Submit NR1 DNB Radio to these directories. Use the stream URL below when prompted.
+          NR1 DNB Radio is listed on all major internet radio directories — search "NR1 DNB Radio" on any of these platforms.
         </p>
-        <div className="border border-white/10 rounded-lg bg-nr1-grey/20 px-4 py-3">
-          <p className="font-mono text-xs text-nr1-muted mb-1">Stream URL</p>
-          <p className="font-mono text-xs text-nr1-cyan break-all">{DIRECT_STREAM_URL}</p>
-        </div>
         <div className="grid sm:grid-cols-3 gap-4">
-          <a
-            href="https://tunein.com/stations/submit/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors"
-          >
-            <p className="font-heading text-lg text-nr1-cyan tracking-widest">TUNEIN</p>
+          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO BROWSER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
-              Submit your station to TuneIn for Alexa, Sonos, and app listeners.
+              Open-source directory powering dozens of radio apps worldwide.
             </p>
-            <p className="font-mono text-xs text-white/40">tunein.com →</p>
-          </a>
-          <a
-            href="https://www.radio.net/info/stationinfo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors"
-          >
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
+          </div>
+          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">MYTUNER</p>
+            <p className="font-mono text-xs text-nr1-muted leading-relaxed">
+              100,000+ stations, available on iOS, Android, and smart TVs.
+            </p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
+          </div>
+          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">ONLINE RADIO BOX</p>
+            <p className="font-mono text-xs text-nr1-muted leading-relaxed">
+              Major global radio directory with iOS and Android apps.
+            </p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
+          </div>
+          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">STREEMA</p>
+            <p className="font-mono text-xs text-nr1-muted leading-relaxed">
+              Popular radio discovery site used across Europe and the Americas.
+            </p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
+          </div>
+          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">VTUNER</p>
+            <p className="font-mono text-xs text-nr1-muted leading-relaxed">
+              Powers built-in internet radio on Pure, Roberts, Yamaha, Denon, and Marantz hardware.
+            </p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Submitted</p>
+          </div>
+          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO.NET</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
-              Reach millions of listeners across Europe and beyond.
+              Europe's largest radio portal — millions of listeners across the continent.
             </p>
-            <p className="font-mono text-xs text-white/40">radio.net →</p>
-          </a>
-          <a
-            href="https://www.internet-radio.com/submit/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors"
-          >
-            <p className="font-heading text-lg text-nr1-cyan tracking-widest">INTERNET-RADIO</p>
-            <p className="font-mono text-xs text-nr1-muted leading-relaxed">
-              One of the largest internet radio directories worldwide.
-            </p>
-            <p className="font-mono text-xs text-white/40">internet-radio.com →</p>
-          </a>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Submitted</p>
+          </div>
         </div>
       </section>
 
