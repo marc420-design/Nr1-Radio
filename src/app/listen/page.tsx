@@ -27,12 +27,9 @@ export default function ListenPage() {
       {/* Browser player — desktop only; mobile uses the persistent StickyPlayer */}
       <section className="space-y-4">
         <h2 className="font-heading text-2xl text-white tracking-widest">IN YOUR BROWSER</h2>
-        <div className="hidden lg:block border border-nr1-cyan/20 rounded-lg bg-nr1-grey/40 p-6">
+        <div className="border border-nr1-cyan/20 rounded-lg bg-nr1-grey/40 p-4 sm:p-6">
           <PlayerBar />
         </div>
-        <p className="lg:hidden font-mono text-xs text-nr1-muted">
-          Use the player bar at the bottom of your screen to listen live.
-        </p>
         <ListenerStats />
       </section>
 

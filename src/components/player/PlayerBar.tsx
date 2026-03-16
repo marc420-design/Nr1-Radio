@@ -18,7 +18,7 @@ export function PlayerBar() {
 
   return (
     <div className="flex justify-center w-full">
-      <div className="player-card flex flex-col items-center gap-6 py-10 px-12 w-full max-w-md">
+      <div className="player-card flex flex-col items-center gap-6 py-6 px-5 sm:py-10 sm:px-12 w-full max-w-md">
         <div className="flex items-center gap-4">
           <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
           <EqualizerBars isPlaying={isPlaying} />

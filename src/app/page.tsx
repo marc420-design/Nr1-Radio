@@ -46,8 +46,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Desktop hero player — mobile uses the persistent StickyPlayer */}
-        <div className="hidden lg:block w-full">
+        {/* Hero player */}
+        <div className="w-full">
           <PlayerBar />
         </div>
 
@@ -57,8 +57,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Track history — desktop only */}
-      <section className="hidden lg:block max-w-2xl mx-auto w-full px-4 pb-12">
+      {/* Track history */}
+      <section className="max-w-2xl mx-auto w-full px-4 pb-12">
         <TrackHistory history={nowPlaying.song_history} />
       </section>
     </div>
