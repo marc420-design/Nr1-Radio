@@ -16,7 +16,7 @@ interface UseAudioStreamReturn {
   status: StreamStatus;
 }
 
-const BACKOFF_DELAYS = [3000, 6000, 12000, 30000]; // ms
+const BACKOFF_DELAYS = [2000, 4000, 8000, 15000, 30000]; // ms
 
 export function useAudioStream(): UseAudioStreamReturn {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -53,19 +53,33 @@ export function useAudioStream(): UseAudioStreamReturn {
       if (isIntentionalPauseRef.current) {
         setStatus("idle");
         setIsPlaying(false);
+      } else {
+        // Unexpected pause — browser dropped the stream, reconnect
+        scheduleRetry();
       }
+    };
+    const onStalled = () => {
+      if (!isIntentionalPauseRef.current) scheduleRetry();
+    };
+    const onEnded = () => {
+      // Live streams shouldn't end — reconnect if they do
+      if (!isIntentionalPauseRef.current) scheduleRetry();
     };
 
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("waiting", onWaiting);
     audio.addEventListener("error", onError);
     audio.addEventListener("pause", onPause);
+    audio.addEventListener("stalled", onStalled);
+    audio.addEventListener("ended", onEnded);
 
     return () => {
       audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("waiting", onWaiting);
       audio.removeEventListener("error", onError);
       audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("stalled", onStalled);
+      audio.removeEventListener("ended", onEnded);
       audio.pause();
       audioRef.current = null;
     };
@@ -74,9 +88,10 @@ export function useAudioStream(): UseAudioStreamReturn {
   }, []);
 
   function scheduleRetry() {
+    if (isIntentionalPauseRef.current) return;
     const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
     retryCountRef.current++;
-    setStatus(retryCountRef.current >= 2 ? "offline" : "reconnecting");
+    setStatus(retryCountRef.current >= 4 ? "offline" : "reconnecting");
 
     retryTimerRef.current = setTimeout(() => {
       if (isIntentionalPauseRef.current) return;
