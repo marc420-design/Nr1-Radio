@@ -22,29 +22,32 @@ const BUFFER_CHECK_MS = 10000; // check buffer every 10s
 const MAX_BUFFER_AHEAD = 30;   // reconnect if buffered > 30s ahead of playback
 
 export function useAudioStream(): UseAudioStreamReturn {
-  const audioRef      = useRef<HTMLAudioElement | null>(null);
-  const retryCountRef = useRef(0);
-  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const watchdogRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bufferCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioRef          = useRef<HTMLAudioElement | null>(null);
+  const retryCountRef     = useRef(0);
+  const retryTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const watchdogRef       = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bufferCheckRef    = useRef<ReturnType<typeof setInterval> | null>(null);
   const isIntentionalPauseRef = useRef(false);
 
-  // Store reconnect/retry fn in a ref so intervals/timeouts always call
-  // the latest version and never hold a stale closure.
-  const scheduleRetryRef = useRef<() => void>(() => {});
+  // Both reconnect fns stored in refs — event handlers & intervals always call
+  // the ref, so they never hold a stale closure even without re-subscribing.
+  const hardReconnectRef  = useRef<() => void>(() => {});
+  const scheduleRetryRef  = useRef<() => void>(() => {});
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted,   setIsMuted]   = useState(false);
   const [volume,    setVolumeState] = useState(0.8);
   const [status,    setStatus]    = useState<StreamStatus>("idle");
 
-  // Keep a stable ref to status setter so effect closures can call it
-  const setStatusRef = useRef(setStatus);
-  setStatusRef.current = setStatus;
+  // Keep stable setter refs so closures inside effects can call them
+  const setStatusRef    = useRef(setStatus);
   const setIsPlayingRef = useRef(setIsPlaying);
+  setStatusRef.current    = setStatus;
   setIsPlayingRef.current = setIsPlaying;
 
-  // ── Build scheduleRetry (refreshed each render so it never goes stale) ────
+  // ── Effect 1: refresh both fn-refs every render (no cleanup, no audio teardown) ──
+  // All state is accessed via refs, so the functions themselves are never stale,
+  // but re-assigning each render is free and guarantees correctness.
   useEffect(() => {
     function clearWatchdog() {
       if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
@@ -66,51 +69,55 @@ export function useAudioStream(): UseAudioStreamReturn {
       audio.play().catch(() => scheduleRetryRef.current());
     }
 
-    function startBufferCheck() {
-      clearBufferCheck();
-      bufferCheckRef.current = setInterval(() => {
-        const audio = audioRef.current;
-        if (!audio || isIntentionalPauseRef.current || audio.paused) return;
-        if (audio.buffered.length > 0) {
-          const ahead = audio.buffered.end(audio.buffered.length - 1) - audio.currentTime;
-          if (ahead > MAX_BUFFER_AHEAD) {
-            hardReconnect();
-          }
-        }
-      }, BUFFER_CHECK_MS);
-    }
-
     function scheduleRetry() {
       if (isIntentionalPauseRef.current) return;
       clearBufferCheck();
       const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
       retryCountRef.current++;
       setStatusRef.current(retryCountRef.current >= 4 ? "offline" : "reconnecting");
-
       retryTimerRef.current = setTimeout(() => {
         if (isIntentionalPauseRef.current) return;
         setStatusRef.current("reconnecting");
-        hardReconnect();
+        hardReconnectRef.current();
       }, delay);
     }
 
-    // Always point the ref at the freshest version
-    scheduleRetryRef.current = scheduleRetry;
+    hardReconnectRef.current  = hardReconnect;
+    scheduleRetryRef.current  = scheduleRetry;
+  }); // intentionally no deps — cheap ref update, no cleanup, no audio teardown
 
-    // ── Audio element is created once on first render ────────────────────
-    if (audioRef.current) return; // already initialised
+  // ── Effect 2: create the Audio element exactly once, clean up on unmount ──
+  useEffect(() => {
+    function clearWatchdog() {
+      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+    }
+    function clearBufferCheck() {
+      if (bufferCheckRef.current) { clearInterval(bufferCheckRef.current); bufferCheckRef.current = null; }
+    }
+
+    const startBufferCheck = () => {
+      clearBufferCheck();
+      bufferCheckRef.current = setInterval(() => {
+        const audio = audioRef.current;
+        if (!audio || isIntentionalPauseRef.current || audio.paused) return;
+        if (audio.buffered.length > 0) {
+          const ahead = audio.buffered.end(audio.buffered.length - 1) - audio.currentTime;
+          if (ahead > MAX_BUFFER_AHEAD) hardReconnectRef.current();
+        }
+      }, BUFFER_CHECK_MS);
+    };
+
+    const armWatchdog = () => {
+      clearWatchdog();
+      watchdogRef.current = setTimeout(() => {
+        if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
+      }, WATCHDOG_MS);
+    };
 
     const audio = new Audio();
     audio.preload = "none";
     audio.volume  = 0.8;
     audioRef.current = audio;
-
-    const armWatchdog = () => {
-      if (watchdogRef.current) clearTimeout(watchdogRef.current);
-      watchdogRef.current = setTimeout(() => {
-        if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
-      }, WATCHDOG_MS);
-    };
 
     audio.addEventListener("playing", () => {
       clearWatchdog();
@@ -144,14 +151,15 @@ export function useAudioStream(): UseAudioStreamReturn {
     });
 
     return () => {
+      // Only runs when the component unmounts — NOT on re-renders
       clearWatchdog();
       clearBufferCheck();
       audio.pause();
       audioRef.current = null;
     };
-  }); // no deps — runs every render to keep scheduleRetryRef fresh
+  }, []); // ← empty deps: audio element created once, destroyed on unmount only
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  // ── Public API ──────────────────────────────────────────────────────────────
 
   const play = useCallback(() => {
     const audio = audioRef.current;
@@ -169,8 +177,8 @@ export function useAudioStream(): UseAudioStreamReturn {
     const audio = audioRef.current;
     if (!audio) return;
     isIntentionalPauseRef.current = true;
-    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
-    if (watchdogRef.current)   clearTimeout(watchdogRef.current);
+    if (retryTimerRef.current)  clearTimeout(retryTimerRef.current);
+    if (watchdogRef.current)    clearTimeout(watchdogRef.current);
     if (bufferCheckRef.current) clearInterval(bufferCheckRef.current);
     audio.pause();
     audio.src = "";
