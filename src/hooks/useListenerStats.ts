@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 interface CountryStat {
   country: string;
   count: number;
+  code: string;
 }
 
 interface CityStat {

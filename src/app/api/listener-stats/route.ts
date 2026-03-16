@@ -43,14 +43,16 @@ export async function GET() {
     const body = await res.json();
     const data = (Array.isArray(body) ? body : []) as AzuraListener[];
 
-    const byCountryCounts = new Map<string, number>();
+    const byCountryCounts = new Map<string, { count: number; code: string }>();
     const byCityCounts = new Map<string, number>();
     for (const listener of data) {
       const country =
         listener.location?.country ||
         listener.location?.country_code ||
         "Unknown";
-      byCountryCounts.set(country, (byCountryCounts.get(country) ?? 0) + 1);
+      const code = listener.location?.country_code ?? "";
+      const existing = byCountryCounts.get(country);
+      byCountryCounts.set(country, { count: (existing?.count ?? 0) + 1, code });
 
       const cityRaw = listener.location?.city?.trim();
       if (cityRaw) {
@@ -60,7 +62,7 @@ export async function GET() {
     }
 
     const byCountry = Array.from(byCountryCounts.entries())
-      .map(([country, count]) => ({ country, count }))
+      .map(([country, { count, code }]) => ({ country, count, code }))
       .sort((a, b) => b.count - a.count);
 
     const byCity = Array.from(byCityCounts.entries())

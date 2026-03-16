@@ -2,12 +2,21 @@
 
 import { useListenerStats } from "@/hooks/useListenerStats";
 
+function countryFlag(code: string): string {
+  if (!code || code.length !== 2) return "🌍";
+  const offset = 0x1f1e6 - "A".charCodeAt(0);
+  return String.fromCodePoint(
+    code.toUpperCase().charCodeAt(0) + offset,
+    code.toUpperCase().charCodeAt(1) + offset
+  );
+}
+
 export function ListenerStats() {
   const { total, byCountry, byCity } = useListenerStats();
 
   if (!total || byCountry.length === 0) {
     return (
-      <div className="border border-white/5 rounded-lg bg-nr1-grey/20 p-4">
+      <div className="border border-white/5 rounded-lg bg-nr1-grey/20 p-5">
         <p className="font-mono text-xs text-nr1-muted uppercase tracking-widest">
           Listening around the world
         </p>
@@ -18,50 +27,67 @@ export function ListenerStats() {
     );
   }
 
-  const top = byCountry.slice(0, 5);
-  const topCities = byCity.slice(0, 5);
+  const topCountries = byCountry.slice(0, 8);
+  const topCities = byCity.slice(0, 6);
+  const maxCount = topCountries[0]?.count ?? 1;
 
   return (
-    <div className="border border-white/10 rounded-lg bg-nr1-grey/30 p-4 space-y-2">
-      <p className="font-mono text-xs text-nr1-muted uppercase tracking-widest">
-        Listening around the world
-      </p>
-      <p className="font-mono text-xs text-white/60">
-        {total} listener{total === 1 ? "" : "s"} connected
-      </p>
-      <div className="flex flex-wrap gap-2 pt-1">
-        {top.map((c) => (
-          <span
-            key={c.country}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-nr1-cyan/30 bg-nr1-cyan/10 text-[11px] font-mono text-nr1-cyan"
-          >
-            <span aria-hidden="true">●</span>
-            <span>{c.country}</span>
-            <span className="text-nr1-muted">
-              {c.count} listener{c.count === 1 ? "" : "s"}
+    <div className="border border-white/10 rounded-lg bg-nr1-grey/30 p-5 space-y-5">
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-xs text-nr1-muted uppercase tracking-widest">
+          Listening around the world
+        </p>
+        <div className="text-right">
+          <p className="font-heading text-3xl text-nr1-cyan leading-none">{total}</p>
+          <p className="font-mono text-[10px] text-nr1-muted">
+            listener{total === 1 ? "" : "s"} now
+          </p>
+        </div>
+      </div>
+
+      {/* Countries with flag + bar */}
+      <div className="space-y-2.5">
+        {topCountries.map((c) => (
+          <div key={c.country} className="flex items-center gap-3">
+            <span className="text-2xl w-8 shrink-0 leading-none" aria-hidden="true">
+              {countryFlag(c.code)}
             </span>
-          </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-mono text-xs text-white truncate">{c.country}</span>
+                <span className="font-mono text-xs text-nr1-cyan shrink-0 ml-2 tabular-nums">
+                  {c.count}
+                </span>
+              </div>
+              <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+                <div
+                  className="h-1 rounded-full bg-nr1-cyan transition-all duration-700"
+                  style={{ width: `${Math.max(4, (c.count / maxCount) * 100)}%` }}
+                />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
+      {/* Cities grid */}
       {topCities.length > 0 && (
-        <div className="pt-2">
-          <p className="font-mono text-[11px] text-white/40 uppercase tracking-widest">
+        <div>
+          <p className="font-mono text-[11px] text-white/40 uppercase tracking-widest mb-2">
             Top cities
           </p>
-          <div className="mt-2 grid sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
             {topCities.map((c) => (
               <div
                 key={`${c.city}-${c.country}`}
-                className="flex items-center justify-between rounded-md border border-white/10 bg-nr1-grey/30 px-3 py-2"
+                className="flex items-center justify-between rounded border border-white/10 bg-nr1-grey/40 px-2.5 py-1.5 gap-1"
               >
-                <div className="min-w-0">
-                  <p className="font-mono text-xs text-white truncate">{c.city}</p>
-                  <p className="font-mono text-[11px] text-white/40 truncate">{c.country}</p>
-                </div>
-                <p className="font-mono text-xs text-nr1-cyan shrink-0">
+                <span className="font-mono text-xs text-white truncate">{c.city}</span>
+                <span className="font-mono text-xs text-nr1-cyan shrink-0 tabular-nums">
                   {c.count}
-                </p>
+                </span>
               </div>
             ))}
           </div>
@@ -70,4 +96,3 @@ export function ListenerStats() {
     </div>
   );
 }
-
