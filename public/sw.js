@@ -1,4 +1,4 @@
-const CACHE_NAME = "nr1-radio-v1";
+const CACHE_NAME = "nr1-radio-v2";
 const OFFLINE_URL = "/offline";
 
 // Static assets to pre-cache
@@ -41,6 +41,14 @@ self.addEventListener("fetch", (event) => {
     url.pathname.includes("/radio/")
   ) {
     event.respondWith(fetch(request).catch(() => new Response("", { status: 503 })));
+    return;
+  }
+
+  // Never cache Next.js build chunks — they are already content-hashed by Next.js
+  // so the browser HTTP cache handles them perfectly. Caching them here causes
+  // ChunkLoadErrors after every deployment when hashes change.
+  if (url.pathname.startsWith("/_next/")) {
+    event.respondWith(fetch(request));
     return;
   }
 
