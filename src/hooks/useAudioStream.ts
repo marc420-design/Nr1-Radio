@@ -19,154 +19,139 @@ interface UseAudioStreamReturn {
 const BACKOFF_DELAYS = [2000, 4000, 8000, 15000, 30000]; // ms
 const WATCHDOG_MS = 15000;     // reconnect if stuck in "waiting" for 15s
 const BUFFER_CHECK_MS = 10000; // check buffer every 10s
-const MAX_BUFFER_AHEAD = 30;   // reconnect if buffered > 30s ahead of current time
+const MAX_BUFFER_AHEAD = 30;   // reconnect if buffered > 30s ahead of playback
 
 export function useAudioStream(): UseAudioStreamReturn {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef      = useRef<HTMLAudioElement | null>(null);
   const retryCountRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const watchdogRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bufferCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isIntentionalPauseRef = useRef(false);
 
+  // Store reconnect/retry fn in a ref so intervals/timeouts always call
+  // the latest version and never hold a stale closure.
+  const scheduleRetryRef = useRef<() => void>(() => {});
+
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolumeState] = useState(0.8);
-  const [status, setStatus] = useState<StreamStatus>("idle");
+  const [isMuted,   setIsMuted]   = useState(false);
+  const [volume,    setVolumeState] = useState(0.8);
+  const [status,    setStatus]    = useState<StreamStatus>("idle");
 
-  // ── helpers ────────────────────────────────────────────────────────────────
+  // Keep a stable ref to status setter so effect closures can call it
+  const setStatusRef = useRef(setStatus);
+  setStatusRef.current = setStatus;
+  const setIsPlayingRef = useRef(setIsPlaying);
+  setIsPlayingRef.current = setIsPlaying;
 
-  function clearWatchdog() {
-    if (watchdogRef.current) {
-      clearTimeout(watchdogRef.current);
-      watchdogRef.current = null;
-    }
-  }
-
-  function clearBufferCheck() {
-    if (bufferCheckRef.current) {
-      clearInterval(bufferCheckRef.current);
-      bufferCheckRef.current = null;
-    }
-  }
-
-  function hardReconnect() {
-    if (isIntentionalPauseRef.current) return;
-    const audio = audioRef.current;
-    if (!audio) return;
-    const vol = audio.volume;
-    const muted = audio.muted;
-    audio.src = `${getStreamUrl()}?_t=${Date.now()}`;
-    audio.volume = vol;
-    audio.muted = muted;
-    audio.load();
-    audio.play().catch(() => scheduleRetry());
-  }
-
-  function scheduleRetry() {
-    if (isIntentionalPauseRef.current) return;
-    clearBufferCheck();
-    const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
-    retryCountRef.current++;
-    setStatus(retryCountRef.current >= 4 ? "offline" : "reconnecting");
-
-    retryTimerRef.current = setTimeout(() => {
-      if (isIntentionalPauseRef.current) return;
-      setStatus("reconnecting");
-      hardReconnect();
-    }, delay);
-  }
-
-  function startBufferCheck() {
-    clearBufferCheck();
-    bufferCheckRef.current = setInterval(() => {
-      const audio = audioRef.current;
-      if (!audio || isIntentionalPauseRef.current || audio.paused) return;
-
-      // Flush buffer if it's grown too far ahead — this is the main 6-min fix
-      if (audio.buffered.length > 0) {
-        const bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
-        const bufferedAhead = bufferedEnd - audio.currentTime;
-        if (bufferedAhead > MAX_BUFFER_AHEAD) {
-          hardReconnect();
-        }
-      }
-    }, BUFFER_CHECK_MS);
-  }
-
-  // ── audio element setup ────────────────────────────────────────────────────
-
+  // ── Build scheduleRetry (refreshed each render so it never goes stale) ────
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    function clearWatchdog() {
+      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+    }
+    function clearBufferCheck() {
+      if (bufferCheckRef.current) { clearInterval(bufferCheckRef.current); bufferCheckRef.current = null; }
+    }
+
+    function hardReconnect() {
+      if (isIntentionalPauseRef.current) return;
+      const audio = audioRef.current;
+      if (!audio) return;
+      const vol   = audio.volume;
+      const muted = audio.muted;
+      audio.src    = `${getStreamUrl()}?_t=${Date.now()}`;
+      audio.volume = vol;
+      audio.muted  = muted;
+      audio.load();
+      audio.play().catch(() => scheduleRetryRef.current());
+    }
+
+    function startBufferCheck() {
+      clearBufferCheck();
+      bufferCheckRef.current = setInterval(() => {
+        const audio = audioRef.current;
+        if (!audio || isIntentionalPauseRef.current || audio.paused) return;
+        if (audio.buffered.length > 0) {
+          const ahead = audio.buffered.end(audio.buffered.length - 1) - audio.currentTime;
+          if (ahead > MAX_BUFFER_AHEAD) {
+            hardReconnect();
+          }
+        }
+      }, BUFFER_CHECK_MS);
+    }
+
+    function scheduleRetry() {
+      if (isIntentionalPauseRef.current) return;
+      clearBufferCheck();
+      const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
+      retryCountRef.current++;
+      setStatusRef.current(retryCountRef.current >= 4 ? "offline" : "reconnecting");
+
+      retryTimerRef.current = setTimeout(() => {
+        if (isIntentionalPauseRef.current) return;
+        setStatusRef.current("reconnecting");
+        hardReconnect();
+      }, delay);
+    }
+
+    // Always point the ref at the freshest version
+    scheduleRetryRef.current = scheduleRetry;
+
+    // ── Audio element is created once on first render ────────────────────
+    if (audioRef.current) return; // already initialised
+
     const audio = new Audio();
     audio.preload = "none";
-    audio.volume = 0.8;
+    audio.volume  = 0.8;
     audioRef.current = audio;
 
     const armWatchdog = () => {
-      clearWatchdog();
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
       watchdogRef.current = setTimeout(() => {
-        if (!isIntentionalPauseRef.current && audioRef.current) {
-          scheduleRetry();
-        }
+        if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
       }, WATCHDOG_MS);
     };
 
-    const onPlaying = () => {
+    audio.addEventListener("playing", () => {
       clearWatchdog();
       retryCountRef.current = 0;
-      setStatus("playing");
-      setIsPlaying(true);
+      setStatusRef.current("playing");
+      setIsPlayingRef.current(true);
       startBufferCheck();
-    };
-    const onWaiting = () => {
+    });
+    audio.addEventListener("waiting", () => {
       if (!isIntentionalPauseRef.current) {
-        setStatus("loading");
+        setStatusRef.current("loading");
         armWatchdog();
       }
-    };
-    const onError = () => {
-      if (isIntentionalPauseRef.current) return;
-      scheduleRetry();
-    };
-    const onPause = () => {
+    });
+    audio.addEventListener("error", () => {
+      if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
+    });
+    audio.addEventListener("pause", () => {
       if (isIntentionalPauseRef.current) {
-        setStatus("idle");
-        setIsPlaying(false);
+        setStatusRef.current("idle");
+        setIsPlayingRef.current(false);
       } else {
-        scheduleRetry();
+        scheduleRetryRef.current();
       }
-    };
-    const onStalled = () => {
-      if (!isIntentionalPauseRef.current) scheduleRetry();
-    };
-    const onEnded = () => {
-      if (!isIntentionalPauseRef.current) scheduleRetry();
-    };
-
-    audio.addEventListener("playing", onPlaying);
-    audio.addEventListener("waiting", onWaiting);
-    audio.addEventListener("error", onError);
-    audio.addEventListener("pause", onPause);
-    audio.addEventListener("stalled", onStalled);
-    audio.addEventListener("ended", onEnded);
+    });
+    audio.addEventListener("stalled", () => {
+      if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
+    });
+    audio.addEventListener("ended", () => {
+      if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
+    });
 
     return () => {
-      audio.removeEventListener("playing", onPlaying);
-      audio.removeEventListener("waiting", onWaiting);
-      audio.removeEventListener("error", onError);
-      audio.removeEventListener("pause", onPause);
-      audio.removeEventListener("stalled", onStalled);
-      audio.removeEventListener("ended", onEnded);
       clearWatchdog();
       clearBufferCheck();
       audio.pause();
       audioRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }); // no deps — runs every render to keep scheduleRetryRef fresh
 
-  // ── public API ─────────────────────────────────────────────────────────────
+  // ── Public API ─────────────────────────────────────────────────────────────
 
   const play = useCallback(() => {
     const audio = audioRef.current;
@@ -177,8 +162,7 @@ export function useAudioStream(): UseAudioStreamReturn {
     setStatus("loading");
     audio.src = `${getStreamUrl()}?_t=${Date.now()}`;
     audio.load();
-    audio.play().catch(() => scheduleRetry());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    audio.play().catch(() => scheduleRetryRef.current());
   }, []);
 
   const pause = useCallback(() => {
@@ -186,13 +170,12 @@ export function useAudioStream(): UseAudioStreamReturn {
     if (!audio) return;
     isIntentionalPauseRef.current = true;
     if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
-    clearWatchdog();
-    clearBufferCheck();
+    if (watchdogRef.current)   clearTimeout(watchdogRef.current);
+    if (bufferCheckRef.current) clearInterval(bufferCheckRef.current);
     audio.pause();
     audio.src = "";
     setIsPlaying(false);
     setStatus("idle");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setVolume = useCallback((vol: number) => {
@@ -200,7 +183,7 @@ export function useAudioStream(): UseAudioStreamReturn {
     setVolumeState(clamped);
     if (audioRef.current) {
       audioRef.current.volume = clamped;
-      audioRef.current.muted = clamped === 0;
+      audioRef.current.muted  = clamped === 0;
       setIsMuted(clamped === 0);
     }
   }, []);

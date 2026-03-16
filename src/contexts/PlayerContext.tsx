@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useAudioStream, type StreamStatus } from "@/hooks/useAudioStream";
 import { useNowPlaying } from "@/hooks/useNowPlaying";
 import { useMediaSession } from "@/hooks/useMediaSession";
@@ -42,8 +42,20 @@ function PlayerProviderInner({ children }: { children: ReactNode }) {
     onPause: audio.pause,
   });
 
+  const value = useMemo(
+    () => ({ ...audio, ...nowPlaying }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      audio.isPlaying, audio.isMuted, audio.volume, audio.status,
+      nowPlaying.track, nowPlaying.artist, nowPlaying.artwork,
+      nowPlaying.isLive, nowPlaying.streamerName,
+      nowPlaying.listenerCount, nowPlaying.uniqueListeners,
+      nowPlaying.isOnline, nowPlaying.history,
+    ]
+  );
+
   return (
-    <PlayerContext.Provider value={{ ...audio, ...nowPlaying }}>
+    <PlayerContext.Provider value={value}>
       {children}
     </PlayerContext.Provider>
   );

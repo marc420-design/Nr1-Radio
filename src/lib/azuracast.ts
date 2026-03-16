@@ -120,8 +120,9 @@ export async function getSchedule(): Promise<ScheduleEntry[]> {
 }
 
 export function getStreamUrl(): string {
-  // Use the Edge proxy to avoid mixed-content blocking on HTTPS
-  if (typeof window !== "undefined") return "/api/stream";
+  // Direct URL — bypasses the /api/stream Edge proxy which has a
+  // ~5-6 minute Vercel streaming timeout that was cutting the stream.
+  // AzuraCast serves on HTTPS so no mixed-content issues.
   return `${BASE_URL}/listen/${STATION_SHORTCODE}/radio.mp3`;
 }
 
