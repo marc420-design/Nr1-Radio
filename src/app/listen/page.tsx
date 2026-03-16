@@ -209,48 +209,48 @@ export default function ListenPage() {
           NR1 DNB Radio is listed on all major internet radio directories — search "NR1 DNB Radio" on any of these platforms.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+          <a href="https://www.radio-browser.info/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO BROWSER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Open-source directory powering dozens of radio apps worldwide.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
-          </div>
-          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+          </a>
+          <a href="https://mytuner-radio.com/radio/nr1-dnb-radio/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">MYTUNER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               100,000+ stations, available on iOS, Android, and smart TVs.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
-          </div>
-          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+          </a>
+          <a href="https://onlineradiobox.com/gb/nr1dnb/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">ONLINE RADIO BOX</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Major global radio directory with iOS and Android apps.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
-          </div>
-          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+          </a>
+          <a href="https://streema.com/radios/NR1_DNB_Radio" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">STREEMA</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Popular radio discovery site used across Europe and the Americas.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Listed</p>
-          </div>
-          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+          </a>
+          <a href="https://www.vtuner.com/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">VTUNER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Powers built-in internet radio on Pure, Roberts, Yamaha, Denon, and Marantz hardware.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Submitted</p>
-          </div>
-          <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
+          </a>
+          <a href="https://www.radio.net/s/nr1dnbradio" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO.NET</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Europe's largest radio portal — millions of listeners across the continent.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Submitted</p>
-          </div>
+          </a>
         </div>
       </section>
 

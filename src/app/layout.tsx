@@ -115,6 +115,11 @@ export default function RootLayout({
                 <span>·</span>
                 <a href={`mailto:${SOCIAL_LINKS.email}`} className="hover:text-nr1-cyan transition-colors">Contact</a>
               </div>
+              <div className="flex items-center gap-4 text-xs font-mono text-nr1-muted">
+                <Link href="/privacy" className="hover:text-nr1-cyan transition-colors">Privacy</Link>
+                <span>·</span>
+                <Link href="/terms" className="hover:text-nr1-cyan transition-colors">Terms</Link>
+              </div>
             </div>
           </div>
         </footer>
