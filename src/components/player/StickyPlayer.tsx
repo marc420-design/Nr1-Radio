@@ -40,9 +40,13 @@ export function StickyPlayer() {
           </p>
         </div>
 
-        {/* Status badge + eq — desktop only */}
-        <div className="hidden sm:flex items-center gap-3">
+        {/* Live badge — always visible */}
+        <div className="shrink-0">
           <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
+        </div>
+
+        {/* Equalizer + listener count — sm+ only */}
+        <div className="hidden sm:flex items-center gap-3">
           <EqualizerBars isPlaying={isPlaying} />
           {listenerCount > 0 && (
             <span className="text-xs font-mono text-nr1-muted whitespace-nowrap">
@@ -56,7 +60,7 @@ export function StickyPlayer() {
           onClick={isPlaying ? pause : play}
           disabled={isLoading}
           aria-label={isPlaying ? "Pause stream" : "Play stream"}
-          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-nr1-cyan text-nr1-black transition-all hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed glow-cyan"
+          className="shrink-0 flex items-center justify-center w-11 h-11 rounded-full bg-nr1-cyan text-nr1-black transition-all hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed glow-cyan"
         >
           {isLoading ? (
             <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -75,7 +79,24 @@ export function StickyPlayer() {
           )}
         </button>
 
-        {/* Volume — desktop only */}
+        {/* Mute toggle — mobile only */}
+        <button
+          onClick={toggleMute}
+          aria-label={isMuted ? "Unmute" : "Mute"}
+          className="sm:hidden shrink-0 flex items-center justify-center w-9 h-9 rounded text-nr1-muted hover:text-nr1-cyan transition-colors"
+        >
+          {isMuted ? (
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16.5 12A4.5 4.5 0 0014 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0021 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0017.73 18l2 2 1.27-1.27-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+            </svg>
+          )}
+        </button>
+
+        {/* Volume slider — desktop only */}
         <div className="hidden lg:block">
           <VolumeControl
             volume={volume}

@@ -139,7 +139,7 @@ export function LiveChat() {
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-nr1-grey/40 overflow-hidden flex flex-col" style={{ height: "420px" }}>
+    <div className="rounded-2xl border border-white/10 bg-nr1-grey/40 overflow-hidden flex flex-col h-72 sm:h-[420px]">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 shrink-0">
         <div className="flex items-center gap-2">

@@ -16,7 +16,7 @@ export default function ListenPage() {
 
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="font-heading text-5xl sm:text-6xl text-nr1-cyan tracking-widest">
+        <h1 className="font-heading text-4xl sm:text-6xl text-nr1-cyan tracking-widest">
           LISTEN LIVE
         </h1>
         <p className="font-mono text-sm text-nr1-muted tracking-widest uppercase">
@@ -97,7 +97,7 @@ export default function ListenPage() {
       <section className="space-y-4">
         <h2 className="font-heading text-2xl text-white tracking-widest">OTHER WAYS TO LISTEN</h2>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
           {/* Radio directories */}
           <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-2">
@@ -159,7 +159,7 @@ export default function ListenPage() {
       <section className="space-y-4">
         <h2 className="font-heading text-2xl text-white tracking-widest">SMART SPEAKERS &amp; HARDWARE</h2>
         <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-6">
-          <div className="grid sm:grid-cols-3 gap-6 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             <div className="space-y-1">
               <p className="font-heading text-xl text-nr1-cyan tracking-widest">AMAZON ALEXA</p>
               <p className="font-mono text-xs text-nr1-muted">Echo · Echo Dot · Fire TV</p>
@@ -211,7 +211,7 @@ export default function ListenPage() {
         <p className="font-mono text-xs text-nr1-muted leading-relaxed">
           NR1 DNB Radio is listed on all major internet radio directories — search "NR1 DNB Radio" on any of these platforms.
         </p>
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO BROWSER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">

@@ -27,11 +27,11 @@ export default async function HomePage() {
               width={180}
               height={180}
               priority
-              className="drop-shadow-[0_0_40px_rgba(0,229,255,0.3)]"
+              className="w-[120px] h-[120px] sm:w-[180px] sm:h-[180px] drop-shadow-[0_0_40px_rgba(0,229,255,0.3)]"
             />
           </div>
 
-          <p className="relative z-10 font-heading text-2xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
+          <p className="relative z-10 font-heading text-xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
             DNB RADIO
           </p>
           <p className="relative z-10 font-mono text-xs text-nr1-muted mt-2 tracking-widest uppercase">
