@@ -98,7 +98,7 @@ export default function RootLayout({
         <StickyPlayer />
 
         {/* Footer */}
-        <footer className="footer-top-shadow border-t border-nr1-cyan/20 py-8 mt-16">
+        <footer className="footer-top-shadow border-t border-nr1-cyan/20 pt-8 pb-24 mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs font-mono text-nr1-muted">
