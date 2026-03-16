@@ -17,11 +17,13 @@ interface UseAudioStreamReturn {
 }
 
 const BACKOFF_DELAYS = [2000, 4000, 8000, 15000, 30000]; // ms
+const WATCHDOG_MS = 15000; // force reconnect if stuck in waiting/loading for 15s
 
 export function useAudioStream(): UseAudioStreamReturn {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryCountRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isIntentionalPauseRef = useRef(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -37,13 +39,33 @@ export function useAudioStream(): UseAudioStreamReturn {
     audio.volume = 0.8;
     audioRef.current = audio;
 
+    const clearWatchdog = () => {
+      if (watchdogRef.current) {
+        clearTimeout(watchdogRef.current);
+        watchdogRef.current = null;
+      }
+    };
+    const armWatchdog = () => {
+      clearWatchdog();
+      watchdogRef.current = setTimeout(() => {
+        if (!isIntentionalPauseRef.current && audioRef.current) {
+          // Still stuck — force reconnect
+          scheduleRetry();
+        }
+      }, WATCHDOG_MS);
+    };
+
     const onPlaying = () => {
+      clearWatchdog();
       retryCountRef.current = 0;
       setStatus("playing");
       setIsPlaying(true);
     };
     const onWaiting = () => {
-      if (!isIntentionalPauseRef.current) setStatus("loading");
+      if (!isIntentionalPauseRef.current) {
+        setStatus("loading");
+        armWatchdog();
+      }
     };
     const onError = () => {
       if (isIntentionalPauseRef.current) return;
@@ -80,6 +102,7 @@ export function useAudioStream(): UseAudioStreamReturn {
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("stalled", onStalled);
       audio.removeEventListener("ended", onEnded);
+      clearWatchdog();
       audio.pause();
       audioRef.current = null;
     };
@@ -122,6 +145,7 @@ export function useAudioStream(): UseAudioStreamReturn {
     if (!audio) return;
     isIntentionalPauseRef.current = true;
     if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
     audio.pause();
     audio.src = "";
     setIsPlaying(false);

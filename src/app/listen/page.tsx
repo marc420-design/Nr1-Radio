@@ -3,6 +3,7 @@ import { PlayerBar } from "@/components/player/PlayerBar";
 import { DIRECT_STREAM_URL, SOCIAL_LINKS } from "@/lib/constants";
 import { ListenerStats } from "@/components/listener/ListenerStats";
 import { EmbedCodeSnippet } from "@/components/ui/EmbedCodeSnippet";
+import { LiveChat } from "@/components/chat/LiveChat";
 
 export const metadata: Metadata = {
   title: "Listen — NR1 DNB Radio",
@@ -33,6 +34,15 @@ export default function ListenPage() {
           Use the player bar at the bottom of your screen to listen live.
         </p>
         <ListenerStats />
+      </section>
+
+      {/* Live Chat */}
+      <section className="space-y-4">
+        <h2 className="font-heading text-2xl text-white tracking-widest">LIVE CHAT</h2>
+        <p className="font-mono text-xs text-nr1-muted leading-relaxed">
+          Chat with other listeners in real time. No sign-up needed.
+        </p>
+        <LiveChat />
       </section>
 
       {/* Alexa section */}

@@ -48,6 +48,43 @@ create table if not exists events (
 alter table events enable row level security;
 create policy "Public read events" on events for select using (true);
 
+-- Live Chat
+create table if not exists chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz default now() not null,
+  username text not null check (char_length(username) between 1 and 20),
+  message text not null check (char_length(message) between 1 and 200),
+  color text not null default '#00E5FF'
+);
+
+alter table chat_messages enable row level security;
+create policy "Public read chat" on chat_messages for select using (true);
+create policy "Public insert chat" on chat_messages for insert with check (
+  char_length(username) between 1 and 20 and
+  char_length(message) between 1 and 200
+);
+
+-- Enable Realtime for live chat
+alter publication supabase_realtime add table chat_messages;
+
+-- Auto-purge: keep only the latest 500 messages
+create or replace function purge_old_chat_messages()
+returns trigger language plpgsql as $$
+begin
+  delete from chat_messages
+  where id in (
+    select id from chat_messages
+    order by created_at desc
+    offset 500
+  );
+  return null;
+end;
+$$;
+
+create trigger trg_purge_chat
+after insert on chat_messages
+execute function purge_old_chat_messages();
+
 -- Sample data (optional — remove before production)
 insert into schedule (show_name, dj_name, day_of_week, start_time, end_time, show_type) values
   ('Friday Night Sessions', 'DJ Example', 4, '20:00', '22:00', 'live'),

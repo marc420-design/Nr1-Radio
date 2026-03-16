@@ -46,6 +46,14 @@ export interface DJRow {
   created_at: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  created_at: string;
+  username: string;
+  message: string;
+  color: string;
+}
+
 export interface EventRow {
   id: string;
   name: string;
