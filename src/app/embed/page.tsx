@@ -22,12 +22,12 @@ export default function EmbedPage() {
             <p className="font-mono text-xs text-nr1-muted">Live 24/7</p>
           )}
           <a
-            href="https://listen.nr1dnb.com"
+            href="https://listen-nr1dnb.com"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-xs text-nr1-muted hover:text-nr1-cyan transition-colors"
           >
-            listen.nr1dnb.com
+            listen-nr1dnb.com
           </a>
         </div>
       </div>

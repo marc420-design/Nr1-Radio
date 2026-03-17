@@ -209,33 +209,33 @@ export default function ListenPage() {
           Find NR1 DNB Radio on these platforms — search "NR1 DNB Radio" to tune in.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <a href="https://www.radio-browser.info/search?name=NR1+DNB" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
+          <a href="https://www.radio-browser.info/search?name=NR1+Drum+and+Bass" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">RADIO BROWSER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Open-source directory powering dozens of radio apps worldwide.
             </p>
-            <p className="font-mono text-xs text-nr1-cyan/60">Search "NR1 DNB"</p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on Radio Browser</p>
           </a>
-          <a href="https://mytuner-radio.com/search/?q=NR1+DNB+Radio" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
+          <a href="https://mytuner-radio.com/radio/nr1-dnb-radio-518564/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">MYTUNER</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               100,000+ stations, available on iOS, Android, and smart TVs.
             </p>
-            <p className="font-mono text-xs text-nr1-cyan/60">Search "NR1 DNB Radio"</p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on myTuner</p>
           </a>
-          <a href="https://onlineradiobox.com/search/?cs=gb&q=NR1+DNB" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
+          <a href="https://onlineradiobox.com/uk/nr1dnb/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">ONLINE RADIO BOX</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Major global radio directory with iOS and Android apps.
             </p>
-            <p className="font-mono text-xs text-nr1-cyan/60">Search "NR1 DNB"</p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on Online Radio Box</p>
           </a>
-          <a href="https://streema.com/radios/search/?q=NR1+DNB" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
+          <a href="https://streema.com/radios/NR1_DNB_Radio" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">STREEMA</p>
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Popular radio discovery site used across Europe and the Americas.
             </p>
-            <p className="font-mono text-xs text-nr1-cyan/60">Search "NR1 DNB"</p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on Streema</p>
           </a>
           <a href="https://www.vtuner.com/" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
             <p className="font-heading text-lg text-nr1-cyan tracking-widest">VTUNER</p>

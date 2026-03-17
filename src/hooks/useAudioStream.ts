@@ -17,7 +17,7 @@ interface UseAudioStreamReturn {
 }
 
 const BACKOFF_DELAYS = [2000, 4000, 8000, 15000, 30000]; // ms
-const WATCHDOG_MS    = 15000; // reconnect if stuck in waiting/stalled/paused for 15s
+const WATCHDOG_MS    = 8000; // reconnect if stuck in waiting/stalled/paused for 8s
 const BUFFER_CHECK_MS = 10000;
 const MAX_BUFFER_AHEAD = 30;  // reconnect if buffered >30s ahead
 
@@ -87,10 +87,15 @@ export function useAudioStream(): UseAudioStreamReturn {
       clearRetryTimer();
       const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
       retryCountRef.current++;
-      setStatusRef.current(retryCountRef.current >= 4 ? "offline" : "reconnecting");
+      if (retryCountRef.current >= 4) {
+        setStatusRef.current("offline");
+        setIsPlayingRef.current(false); // show play button so user can restart
+      } else {
+        setStatusRef.current("reconnecting");
+      }
       retryTimerRef.current = setTimeout(() => {
         if (isIntentionalPauseRef.current) return;
-        setStatusRef.current("reconnecting");
+        if (retryCountRef.current < 5) setStatusRef.current("reconnecting");
         hardReconnectRef.current();
       }, delay);
     }

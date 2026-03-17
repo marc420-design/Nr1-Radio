@@ -45,15 +45,15 @@ export function StickyPlayer() {
           <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
         </div>
 
-        {/* Equalizer + listener count — sm+ only */}
-        <div className="hidden sm:flex items-center gap-3">
-          <EqualizerBars isPlaying={isPlaying} />
-          {listenerCount > 0 && (
+        {/* Listener count — mobile shows count only, sm+ shows equalizer + count */}
+        {listenerCount > 0 && (
+          <div className="flex items-center gap-3 shrink-0">
+            <EqualizerBars isPlaying={isPlaying} />
             <span className="text-xs font-mono text-nr1-muted whitespace-nowrap">
               {listenerCount} listening
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Play/pause */}
         <button
