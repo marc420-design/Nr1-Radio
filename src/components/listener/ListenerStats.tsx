@@ -1,6 +1,7 @@
 "use client";
 
 import { useListenerStats } from "@/hooks/useListenerStats";
+import { usePlayer } from "@/contexts/PlayerContext";
 
 function countryFlag(code: string): string {
   if (!code || code.length !== 2) return "🌍";
@@ -13,8 +14,13 @@ function countryFlag(code: string): string {
 
 export function ListenerStats() {
   const { total, byCountry, byCity } = useListenerStats();
+  const { listenerCount } = usePlayer();
 
-  if (!total || byCountry.length === 0) {
+  // Use the nowplaying listener count as a fallback when the admin API key
+  // isn't configured (listener-stats returns 0 without AZURACAST_API_KEY).
+  const displayTotal = total > 0 ? total : listenerCount;
+
+  if (!displayTotal) {
     return (
       <div className="border border-white/5 rounded-lg bg-nr1-grey/20 p-5">
         <p className="font-mono text-xs text-nr1-muted uppercase tracking-widest">
@@ -40,9 +46,9 @@ export function ListenerStats() {
           Listening around the world
         </p>
         <div className="text-right">
-          <p className="font-heading text-3xl text-nr1-cyan leading-none">{total}</p>
+          <p className="font-heading text-3xl text-nr1-cyan leading-none">{displayTotal}</p>
           <p className="font-mono text-[10px] text-nr1-muted">
-            listener{total === 1 ? "" : "s"} now
+            listener{displayTotal === 1 ? "" : "s"} now
           </p>
         </div>
       </div>

@@ -13,7 +13,7 @@ export default function TermsPage() {
       <div className="space-y-6 font-mono text-sm text-white/70 leading-relaxed">
         <section className="space-y-2">
           <h2 className="font-heading text-lg text-white tracking-widest">USE OF SERVICE</h2>
-          <p>NR1 DNB Radio provides a free live internet radio streaming service available via our website at listen.nr1dnb.com and via the NR1 DNB Radio Alexa skill. By using our service you agree to these terms.</p>
+          <p>NR1 DNB Radio provides a free live internet radio streaming service available via our website at listen-nr1dnb.com and via the NR1 DNB Radio Alexa skill. By using our service you agree to these terms.</p>
         </section>
         <section className="space-y-2">
           <h2 className="font-heading text-lg text-white tracking-widest">PERMITTED USE</h2>

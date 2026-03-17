@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       <div className="space-y-6 font-mono text-sm text-white/70 leading-relaxed">
         <section className="space-y-2">
           <h2 className="font-heading text-lg text-white tracking-widest">OVERVIEW</h2>
-          <p>NR1 DNB Radio operates the NR1 DNB Radio website at listen.nr1dnb.com and the NR1 DNB Radio Alexa skill. This policy explains how we handle information.</p>
+          <p>NR1 DNB Radio operates the NR1 DNB Radio website at listen-nr1dnb.com and the NR1 DNB Radio Alexa skill. This policy explains how we handle information.</p>
         </section>
         <section className="space-y-2">
           <h2 className="font-heading text-lg text-white tracking-widest">DATA WE COLLECT</h2>

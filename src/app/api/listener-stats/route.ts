@@ -3,27 +3,41 @@ import { AZURACAST_BASE_URL as BASE_URL, STATION_ID } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
+// AzuraCast returns location.country as an ISO 3166-1 alpha-2 code (e.g. "GB"),
+// not a full country name. location.country_code does not exist in the response.
 interface AzuraListener {
   location?: {
     city?: string;
-    country?: string;
-    country_code?: string;
+    country?: string;    // ISO code e.g. "GB"
+    region?: string;
+    description?: string;
+    lat?: number;
+    lon?: number;
   };
 }
+
+// Map ISO codes to display names for the most common listener countries.
+// Falls back to the code itself for unlisted ones.
+const COUNTRY_NAMES: Record<string, string> = {
+  GB: "United Kingdom", US: "United States", IE: "Ireland",
+  DE: "Germany", FR: "France", NL: "Netherlands", AU: "Australia",
+  CA: "Canada", NZ: "New Zealand", BE: "Belgium", SE: "Sweden",
+  NO: "Norway", DK: "Denmark", FI: "Finland", ES: "Spain",
+  IT: "Italy", PT: "Portugal", PL: "Poland", CZ: "Czech Republic",
+  AT: "Austria", CH: "Switzerland", ZA: "South Africa", JP: "Japan",
+  BR: "Brazil", MX: "Mexico", IN: "India", SG: "Singapore",
+  HK: "Hong Kong", MY: "Malaysia", TH: "Thailand", NG: "Nigeria",
+  KE: "Kenya", GH: "Ghana", JM: "Jamaica", TT: "Trinidad and Tobago",
+};
 
 export async function GET() {
   const apiKey = process.env.AZURACAST_API_KEY;
   if (!apiKey) {
-    // Fail soft if key not configured – just return empty stats
     return NextResponse.json({ total: 0, byCountry: [], byCity: [] });
   }
 
   try {
-    const headers: Record<string, string> = {
-      Accept: "application/json",
-    };
-    // AzuraCast commonly supports X-API-Key for admin API access
-    // but allow passing a full Authorization value if the user stores it that way.
+    const headers: Record<string, string> = { Accept: "application/json" };
     if (/^bearer\s/i.test(apiKey)) {
       headers.Authorization = apiKey;
     } else {
@@ -45,18 +59,18 @@ export async function GET() {
 
     const byCountryCounts = new Map<string, { count: number; code: string }>();
     const byCityCounts = new Map<string, number>();
+
     for (const listener of data) {
-      const country =
-        listener.location?.country ||
-        listener.location?.country_code ||
-        "Unknown";
-      const code = listener.location?.country_code ?? "";
-      const existing = byCountryCounts.get(country);
-      byCountryCounts.set(country, { count: (existing?.count ?? 0) + 1, code });
+      // AzuraCast returns the ISO code in location.country (e.g. "GB")
+      const code = listener.location?.country?.toUpperCase() ?? "";
+      const countryName = (code && COUNTRY_NAMES[code]) ? COUNTRY_NAMES[code] : (code || "Unknown");
+
+      const existing = byCountryCounts.get(countryName);
+      byCountryCounts.set(countryName, { count: (existing?.count ?? 0) + 1, code });
 
       const cityRaw = listener.location?.city?.trim();
       if (cityRaw) {
-        const cityKey = `${cityRaw}||${country}`;
+        const cityKey = `${cityRaw}||${countryName}`;
         byCityCounts.set(cityKey, (byCityCounts.get(cityKey) ?? 0) + 1);
       }
     }
@@ -72,13 +86,8 @@ export async function GET() {
       })
       .sort((a, b) => b.count - a.count);
 
-    return NextResponse.json({
-      total: data.length,
-      byCountry,
-      byCity,
-    });
+    return NextResponse.json({ total: data.length, byCountry, byCity });
   } catch {
     return NextResponse.json({ total: 0, byCountry: [], byCity: [] }, { status: 503 });
   }
 }
-

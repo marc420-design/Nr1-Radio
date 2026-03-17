@@ -19,9 +19,9 @@ export const STATION_META = {
   description:  "Norwich's underground drum & bass radio station. Live Friday sessions, 24/7 stream, 30+ DJs. Est. 2018.",
 
   // ─── URLs ──────────────────────────────────────────────────────────────────
-  siteUrl:      "https://listen.nr1dnb.com",
+  siteUrl:      "https://listen-nr1dnb.com",
   streamUrl:    DIRECT_STREAM_URL,
-  logoUrl:      "https://listen.nr1dnb.com/icons/icon-512.png",
+  logoUrl:      "https://listen-nr1dnb.com/icons/icon-512.png",
 
   // ─── Classification ────────────────────────────────────────────────────────
   genre:        "Drum and Bass",

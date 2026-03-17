@@ -34,8 +34,8 @@ export function PlayerBar() {
         {track && artist && (
           <ShareButton
             title="NR1 DNB Radio"
-            text={`Listening to ${artist} - ${track} on NR1 DNB Radio 🎵 listen.nr1dnb.com`}
-            url="https://listen.nr1dnb.com"
+            text={`Listening to ${artist} - ${track} on NR1 DNB Radio 🎵 listen-nr1dnb.com`}
+            url="https://listen-nr1dnb.com"
             label="Share track"
           />
         )}

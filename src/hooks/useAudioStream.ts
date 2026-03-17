@@ -125,11 +125,21 @@ export function useAudioStream(): UseAudioStreamReturn {
 
     const startBufferCheck = () => {
       clearBufferCheck();
+      let prevCurrentTime = audioRef.current?.currentTime ?? 0;
       bufferCheckRef.current = setInterval(() => {
         const audio = audioRef.current;
         if (!audio || isIntentionalPauseRef.current || audio.paused) return;
+        // Detect silent stall: currentTime not advancing while playing
+        const ct = audio.currentTime;
+        if (ct <= prevCurrentTime + 1) {
+          // Less than 1 second of advancement in BUFFER_CHECK_MS (10s) = dead stream
+          hardReconnectRef.current();
+          return;
+        }
+        prevCurrentTime = ct;
+        // Detect excessive buffering
         if (audio.buffered.length > 0) {
-          const ahead = audio.buffered.end(audio.buffered.length - 1) - audio.currentTime;
+          const ahead = audio.buffered.end(audio.buffered.length - 1) - ct;
           if (ahead > MAX_BUFFER_AHEAD) hardReconnectRef.current();
         }
       }, BUFFER_CHECK_MS);
