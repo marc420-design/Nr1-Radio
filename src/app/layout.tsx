@@ -40,11 +40,20 @@ export const metadata: Metadata = {
     description: STATION_META.description,
     type: "website",
     url: STATION_META.siteUrl,
+    images: [
+      {
+        url: "https://listen-nr1dnb.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: STATION_META.name,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: STATION_META.name,
     description: STATION_META.description,
+    images: ["https://listen-nr1dnb.com/og-image.png"],
   },
 };
 
