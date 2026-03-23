@@ -2,6 +2,7 @@ import Image from "next/image";
 import { PlayerBar } from "@/components/player/PlayerBar";
 import { TrackHistory } from "@/components/player/TrackHistory";
 import { ExternalPlayerLink } from "@/components/ui/ExternalPlayerLink";
+import { ListenerStats } from "@/components/listener/ListenerStats";
 import { getNowPlaying } from "@/lib/azuracast";
 import { STAT_BADGES } from "@/lib/constants";
 
@@ -57,9 +58,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Track history */}
-      <section className="max-w-2xl mx-auto w-full px-4 pb-12">
+      {/* Track history + listener stats */}
+      <section className="max-w-2xl mx-auto w-full px-4 pb-12 space-y-6">
         <TrackHistory history={nowPlaying.song_history} />
+        <ListenerStats />
       </section>
     </div>
   );
