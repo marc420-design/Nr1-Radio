@@ -85,6 +85,24 @@ create trigger trg_purge_chat
 after insert on chat_messages
 execute function purge_old_chat_messages();
 
+-- Shows archive (uploaded from AzuraCast media library)
+create table if not exists shows (
+  id               uuid primary key default gen_random_uuid(),
+  youtube_id       text unique not null,
+  title            text not null,           -- e.g. "NR1 LIVE SHOW"
+  lineup           text,                    -- e.g. "DJ TUFF KUTS, MC CONTAGIOUS"
+  duration_min     numeric,
+  lufs             numeric,
+  clipping_status  text,                    -- 'OK' or 'CLIPPING_RISK'
+  azuracast_id     integer,                 -- file ID returned by AzuraCast API
+  azuracast_path   text,                    -- path in AzuraCast media library
+  uploaded_at      timestamptz default now(),
+  created_at       timestamptz default now()
+);
+
+alter table shows enable row level security;
+create policy "Public read shows" on shows for select using (true);
+
 -- Sample data (optional — remove before production)
 insert into schedule (show_name, dj_name, day_of_week, start_time, end_time, show_type) values
   ('Friday Night Sessions', 'DJ Example', 4, '20:00', '22:00', 'live'),

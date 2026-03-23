@@ -54,6 +54,20 @@ export interface ChatMessage {
   color: string;
 }
 
+export interface ShowRow {
+  id: string;
+  youtube_id: string;
+  title: string;
+  lineup: string | null;
+  duration_min: number | null;
+  lufs: number | null;
+  clipping_status: string | null;
+  azuracast_id: number | null;
+  azuracast_path: string | null;
+  uploaded_at: string;
+  created_at: string;
+}
+
 export interface EventRow {
   id: string;
   name: string;
