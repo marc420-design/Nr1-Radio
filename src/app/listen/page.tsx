@@ -249,7 +249,7 @@ export default function ListenPage() {
             <p className="font-mono text-xs text-nr1-muted leading-relaxed">
               Europe's largest radio portal — millions of listeners across the continent.
             </p>
-            <p className="font-mono text-xs text-nr1-cyan/60">⏳ Submitted</p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on radio.net</p>
           </a>
         </div>
       </section>

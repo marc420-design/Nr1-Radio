@@ -5,7 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { NavLinks } from "@/components/ui/NavLinks";
 import { StickyPlayer } from "@/components/player/StickyPlayer";
+import { PwaInstallBanner } from "@/components/ui/PwaInstallBanner";
 import { SOCIAL_LINKS } from "@/lib/constants";
+
+const DIRECTORY_LINKS = [
+  { label: "TuneIn",          href: "https://tunein.com/search/?query=NR1+DNB+Radio" },
+  { label: "radio.net",       href: "https://www.radio.net/search/nr1+dnb" },
+  { label: "MyTuner",         href: "https://mytuner-radio.com/radio/nr1-dnb-radio-518564/" },
+  { label: "OnlineRadioBox",  href: "https://onlineradiobox.com/uk/nr1dnb/" },
+  { label: "Radio Browser",   href: "https://www.radio-browser.info/search?name=NR1+Drum+and+Bass" },
+] as const;
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -33,10 +42,32 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
+      <PwaInstallBanner />
       <StickyPlayer />
 
       <footer className="footer-top-shadow border-t border-nr1-cyan/20 pt-8 pb-24 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          {/* Directory links */}
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+            <span className="text-xs font-mono text-nr1-muted shrink-0">Listen on:</span>
+            <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2">
+              {DIRECTORY_LINKS.map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-full border border-white/10 text-xs font-mono text-nr1-muted hover:text-nr1-cyan hover:border-nr1-cyan/30 transition-colors"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="border-t border-white/5" />
+
+          {/* Social + legal */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs font-mono text-nr1-muted">
               © {new Date().getFullYear()} NR1 DNB Radio · Norwich, UK

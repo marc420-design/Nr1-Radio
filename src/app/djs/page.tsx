@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "DJs & MCs — NR1 DNB Radio",
-  description: "Meet the 30+ DJs and MCs behind NR1 Drum and Bass Radio. Norwich's underground DNB crew, broadcasting live since 2018.",
+  description: "Meet the 20+ DJs and MCs behind NR1 Drum and Bass Radio. Norwich's underground DNB crew, broadcasting live since 2018.",
 };
 
 export default async function DJsPage() {
@@ -39,7 +39,7 @@ export default async function DJsPage() {
           <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide">The Crew</h1>
         </div>
         <p className="font-mono text-sm text-nr1-muted mt-3">
-          30+ DJs &amp; MCs · Norwich · Est. 2018
+          20+ DJs &amp; MCs · Norwich · Est. 2018
         </p>
       </div>
 

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { ScheduleGrid } from "@/components/schedule/ScheduleGrid";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import type { ScheduleRow } from "@/lib/supabase";
+
+export const metadata: Metadata = {
+  title: "Schedule — NR1 DNB Radio",
+  description: "Weekly drum & bass show schedule for NR1 DNB Radio. Live Friday sessions, guest mixes, and 24/7 DNB from Norwich.",
+};
 
 export const revalidate = 300;
 

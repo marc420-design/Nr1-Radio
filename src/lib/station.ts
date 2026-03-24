@@ -16,7 +16,7 @@ export const STATION_META = {
   // ─── Identity ──────────────────────────────────────────────────────────────
   name:         "NR1 Drum and Bass Radio",
   shortName:    "NR1 DNB",
-  description:  "Norwich's underground drum & bass radio station. Live Friday sessions, 24/7 stream, 30+ DJs. Est. 2018.",
+  description:  "Norwich's underground drum & bass radio station. Live Friday sessions, 24/7 stream, 20+ DJs & MCs. Est. 2018.",
 
   // ─── URLs ──────────────────────────────────────────────────────────────────
   siteUrl:      "https://listen-nr1dnb.com",

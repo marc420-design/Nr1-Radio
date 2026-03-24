@@ -5,6 +5,7 @@ import { usePlayer } from "@/contexts/PlayerContext";
 import { EqualizerBars } from "./EqualizerBars";
 import { LiveBadge } from "./LiveBadge";
 import { VolumeControl } from "./VolumeControl";
+import { ShareButton } from "@/components/ui/ShareButton";
 
 export function StickyPlayer() {
   const {
@@ -52,6 +53,18 @@ export function StickyPlayer() {
             <span className="text-xs font-mono text-nr1-muted whitespace-nowrap">
               {listenerCount} listening
             </span>
+          </div>
+        )}
+
+        {/* Share button — shown when track info is available */}
+        {track && artist && (
+          <div className="shrink-0 hidden sm:block">
+            <ShareButton
+              title="NR1 DNB Radio"
+              text={`Listening to ${artist} - ${track} on NR1 DNB Radio 🎵`}
+              url="https://listen-nr1dnb.com"
+              label=""
+            />
           </div>
         )}
 

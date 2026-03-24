@@ -30,4 +30,4 @@ export const SOCIAL_LINKS = {
 export const TRACK_HISTORY_LIMIT = 8;
 
 // ─── Home page stat badges ────────────────────────────────────────────────────
-export const STAT_BADGES = ["30+ DJs", "Est. 2018", "Norwich, UK"] as const;
+export const STAT_BADGES = ["20+ DJs & MCs", "Est. 2018", "Norwich, UK"] as const;

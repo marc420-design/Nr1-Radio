@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { SOCIAL_LINKS } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "About — NR1 DNB Radio",
+  description: "Norwich's underground drum & bass radio station. Est. 2018. 20+ DJs & MCs broadcasting 24/7.",
+};
 
 export const revalidate = 3600;
 
@@ -13,7 +19,7 @@ export default async function AboutPage() {
         <div className="space-y-4 font-body text-white/70 leading-relaxed">
           <p>
             NR1 Drum & Bass — est. 2018. Norwich&apos;s home of underground DNB, broadcasting 24/7 with
-            30+ DJs and MCs representing the scene.
+            20+ DJs and MCs representing the scene.
           </p>
           <p>
             DJing and MCing has changed over the years. Now it&apos;s more about being the soul of the party.
@@ -75,7 +81,7 @@ export default async function AboutPage() {
         <div className="mt-8 rounded-xl border border-white/10 bg-nr1-grey p-5 flex items-center justify-between gap-4">
           <div>
             <h3 className="font-heading text-xl text-white mb-1">Meet the Team</h3>
-            <p className="text-sm text-white/60">30+ DJs and MCs — see the full crew.</p>
+            <p className="text-sm text-white/60">20+ DJs and MCs — see the full crew.</p>
           </div>
           <a
             href="/djs"
