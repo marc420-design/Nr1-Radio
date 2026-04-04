@@ -20,6 +20,14 @@ export function getSupabaseServerClient() {
   });
 }
 
+// Admin client — bypasses RLS, server-side only
+export function getSupabaseAdminClient() {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 // Type definitions matching our schema
 export interface ScheduleRow {
   id: string;
