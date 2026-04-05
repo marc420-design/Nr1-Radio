@@ -15,7 +15,7 @@ export function DJCard({ dj }: DJCardProps) {
             alt={dj.name}
             fill
             sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
