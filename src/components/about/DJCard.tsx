@@ -14,6 +14,7 @@ export function DJCard({ dj }: DJCardProps) {
             src={dj.photo_url}
             alt={dj.name}
             fill
+            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
             className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
