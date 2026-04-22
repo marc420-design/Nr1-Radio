@@ -3,11 +3,14 @@ import { DJCard } from "@/components/about/DJCard";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import type { DJRow } from "@/lib/supabase";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "DJs & MCs — NR1 DNB Radio",
   description: "Meet the 20+ DJs and MCs behind NR1 Drum and Bass Radio. Norwich's underground DNB crew, broadcasting live since 2018.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/djs",
+  },
 };
 
 export default async function DJsPage() {
