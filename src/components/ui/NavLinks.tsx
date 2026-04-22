@@ -8,9 +8,8 @@ const NAV_ITEMS = [
   { href: "/schedule", label: "Schedule" },
   { href: "/events",   label: "Events" },
   { href: "/shows",    label: "Shows" },
-  { href: "/djs",      label: "DJs" },
+  { href: "/djs",      label: "DJs & MCs" },
   { href: "/about",    label: "About" },
-  { href: "/listen",   label: "Listen" },
 ] as const;
 
 export function NavLinks() {

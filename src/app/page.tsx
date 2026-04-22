@@ -3,13 +3,31 @@ import { PlayerBar } from "@/components/player/PlayerBar";
 import { TrackHistory } from "@/components/player/TrackHistory";
 import { ExternalPlayerLink } from "@/components/ui/ExternalPlayerLink";
 import { ListenerStats } from "@/components/listener/ListenerStats";
+import { NextShowBanner } from "@/components/schedule/NextShowBanner";
 import { getNowPlaying } from "@/lib/azuracast";
+import { getSupabaseServerClient } from "@/lib/supabase";
+import type { ScheduleRow } from "@/lib/supabase";
 import { STAT_BADGES } from "@/lib/constants";
 
 export const revalidate = 15;
 
 export default async function HomePage() {
-  const nowPlaying = await getNowPlaying();
+  const [nowPlaying, schedule] = await Promise.all([
+    getNowPlaying(),
+    (async () => {
+      try {
+        const supabase = getSupabaseServerClient();
+        const { data } = await supabase
+          .from("schedule")
+          .select("*")
+          .order("day_of_week")
+          .order("start_time");
+        return (data as ScheduleRow[]) ?? [];
+      } catch {
+        return [];
+      }
+    })(),
+  ]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col">
@@ -32,9 +50,9 @@ export default async function HomePage() {
             />
           </div>
 
-          <p className="relative z-10 font-heading text-xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
+          <h1 className="relative z-10 font-heading text-xl sm:text-3xl text-nr1-cyan tracking-[0.4em] mt-1">
             DNB RADIO
-          </p>
+          </h1>
           <p className="relative z-10 font-mono text-xs text-nr1-muted mt-2 tracking-widest uppercase">
             Norwich · Drum &amp; Bass · 24/7
           </p>
@@ -45,6 +63,14 @@ export default async function HomePage() {
               <span key={badge} className="stat-badge">{badge}</span>
             ))}
           </div>
+
+          {/* Listen Live CTA */}
+          <a
+            href="/listen"
+            className="relative z-10 mt-6 inline-flex items-center gap-2 px-8 py-3 bg-nr1-cyan text-nr1-black font-heading text-lg tracking-widest rounded hover:bg-nr1-cyan/90 transition-colors"
+          >
+            <span className="animate-pulse">●</span> LISTEN LIVE
+          </a>
         </div>
 
         {/* Hero player */}
@@ -56,6 +82,13 @@ export default async function HomePage() {
         <div className="mt-4 lg:mt-2">
           <ExternalPlayerLink />
         </div>
+
+        {/* Next show countdown */}
+        {schedule.length > 0 && (
+          <div className="mt-6 w-full max-w-md">
+            <NextShowBanner schedule={schedule} />
+          </div>
+        )}
       </section>
 
       {/* Track history + listener stats */}
