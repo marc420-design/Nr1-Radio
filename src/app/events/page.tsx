@@ -6,6 +6,9 @@ import type { EventRow } from "@/lib/supabase";
 export const metadata: Metadata = {
   title: "Events — NR1 DNB Radio",
   description: "Upcoming NR1 DNB nights and appearances. Live drum & bass events in Norwich and beyond.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/events",
+  },
 };
 
 export const revalidate = 300;

@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy — NR1 DNB Radio",
   description: "Privacy policy for NR1 DNB Radio and the NR1 DNB Radio Alexa skill.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/privacy",
+  },
 };
 
 export default function PrivacyPage() {
