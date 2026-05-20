@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { EqualizerBars } from "./EqualizerBars";
 import { LiveBadge } from "./LiveBadge";
@@ -15,6 +16,8 @@ export function StickyPlayer() {
   } = usePlayer();
 
   const isLoading = status === "loading" || status === "reconnecting";
+  const [artError, setArtError] = useState(false);
+  useEffect(() => { setArtError(false); }, [artwork]);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-nr1-grey/95 backdrop-blur-md border-t border-nr1-cyan/20 mobile-bar-glow">
@@ -22,12 +25,10 @@ export function StickyPlayer() {
 
         {/* Artwork */}
         <div className="relative w-10 h-10 shrink-0 rounded overflow-hidden bg-nr1-black border border-nr1-cyan/20">
-          {artwork ? (
-            <Image src={artwork} alt="" fill className="object-cover" />
+          {artwork && !artError ? (
+            <Image src={artwork} alt="" fill className="object-cover" onError={() => setArtError(true)} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-nr1-cyan font-heading text-xs">NR1</span>
-            </div>
+            <Image src="/icons/icon-192.png" alt="NR1 DNB Radio" fill className="object-cover" />
           )}
         </div>
 

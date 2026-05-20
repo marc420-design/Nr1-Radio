@@ -60,7 +60,7 @@ export function TrackHistory({ history }: TrackHistoryProps) {
         Recently Played
       </p>
       <div className="space-y-0">
-        {history.slice(0, TRACK_HISTORY_LIMIT).map((entry, i) => (
+        {history.filter(entry => entry.song.artist?.trim()).slice(0, TRACK_HISTORY_LIMIT).map((entry, i) => (
           <div
             key={`${entry.song.id}-${i}`}
             className="group flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0 opacity-60 hover:opacity-90 transition-opacity"
