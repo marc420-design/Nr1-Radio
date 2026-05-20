@@ -8,6 +8,9 @@ import { LiveChat } from "@/components/chat/LiveChat";
 export const metadata: Metadata = {
   title: "Listen — NR1 DNB Radio",
   description: "Listen live to NR1 DNB Radio on Alexa, TuneIn, or in your browser. Norwich's finest drum & bass station.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/listen",
+  },
 };
 
 export default function ListenPage() {
@@ -177,20 +180,46 @@ export default function ListenPage() {
       </section>
 
       {/* Friday sessions callout */}
-      <section className="border border-nr1-crimson/30 rounded-lg bg-nr1-crimson/5 p-6 space-y-3">
+      <section className="border border-nr1-crimson/30 rounded-lg bg-nr1-crimson/5 p-6 space-y-4">
         <p className="font-heading text-2xl text-nr1-crimson tracking-widest">LIVE FRIDAYS</p>
         <p className="font-mono text-sm text-white/70 leading-relaxed">
-          Every Friday — live DJ sets streamed direct. Tune in on Alexa, TuneIn, or right here in
-          your browser. Follow us on Facebook for session announcements.
+          Every Friday — live DJ sets streamed direct to Kick, Twitch, TikTok, and Facebook.
+          Tune in on Alexa, TuneIn, or right here in your browser.
         </p>
-        <a
-          href={SOCIAL_LINKS.facebook}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block font-mono text-xs text-nr1-crimson hover:underline"
-        >
-          facebook.com/nr1dnb →
-        </a>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href={SOCIAL_LINKS.kick}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-mono text-xs text-nr1-crimson border border-nr1-crimson/40 rounded px-3 py-1.5 hover:bg-nr1-crimson/10 transition-colors"
+          >
+            <span>▶</span> Kick
+          </a>
+          <a
+            href={SOCIAL_LINKS.twitch}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-mono text-xs text-nr1-crimson border border-nr1-crimson/40 rounded px-3 py-1.5 hover:bg-nr1-crimson/10 transition-colors"
+          >
+            <span>▶</span> Twitch
+          </a>
+          <a
+            href={SOCIAL_LINKS.tiktok}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-mono text-xs text-nr1-crimson border border-nr1-crimson/40 rounded px-3 py-1.5 hover:bg-nr1-crimson/10 transition-colors"
+          >
+            <span>▶</span> TikTok
+          </a>
+          <a
+            href={SOCIAL_LINKS.facebook}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-mono text-xs text-nr1-crimson border border-nr1-crimson/40 rounded px-3 py-1.5 hover:bg-nr1-crimson/10 transition-colors"
+          >
+            <span>▶</span> Facebook
+          </a>
+        </div>
       </section>
 
       {/* Embed the player */}
@@ -250,6 +279,13 @@ export default function ListenPage() {
               Europe's largest radio portal — millions of listeners across the continent.
             </p>
             <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on radio.net</p>
+          </a>
+          <a href="https://tunein.com/search/?query=NR1+DNB+Radio" target="_blank" rel="noopener noreferrer" className="border border-white/10 rounded-lg bg-nr1-grey/40 p-5 space-y-1 hover:border-nr1-cyan/40 transition-colors block">
+            <p className="font-heading text-lg text-nr1-cyan tracking-widest">TUNEIN</p>
+            <p className="font-mono text-xs text-nr1-muted leading-relaxed">
+              Powers Alexa, Google Home, Sonos, and in-car systems globally.
+            </p>
+            <p className="font-mono text-xs text-nr1-cyan/60">✅ Now on TuneIn</p>
           </a>
         </div>
       </section>

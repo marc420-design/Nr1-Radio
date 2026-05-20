@@ -4,6 +4,9 @@ import { SOCIAL_LINKS } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "About — NR1 DNB Radio",
   description: "Norwich's underground drum & bass radio station. Est. 2018. 20+ DJs & MCs broadcasting 24/7.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/about",
+  },
 };
 
 export const revalidate = 3600;

@@ -6,6 +6,9 @@ import type { ShowRow } from "@/lib/supabase";
 export const metadata: Metadata = {
   title: "Shows — NR1 DNB Radio",
   description: "Archive of NR1 DNB Radio shows and DJ sets. Drum & bass mixes from Norwich's finest crew.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/shows",
+  },
 };
 
 export const revalidate = 3600;
@@ -36,30 +39,39 @@ export default async function ShowsPage() {
       </div>
 
       {shows.length === 0 ? (
-        <div className="text-center py-20 space-y-3">
-          <p className="font-heading text-2xl text-white/20 tracking-widest">ARCHIVE COMING SOON</p>
-          <p className="font-mono text-sm text-nr1-muted">Sets are uploaded regularly — check back soon.</p>
-          <p className="font-mono text-xs text-nr1-muted/60">
-            In the meantime,{" "}
-            <a
-              href="https://www.mixcloud.com/Nr1family/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-nr1-cyan hover:underline"
-            >
-              find us on Mixcloud
-            </a>{" "}
-            and{" "}
+        <div className="space-y-10">
+
+          {/* Mixcloud embed */}
+          <div className="space-y-4">
+            <h2 className="font-heading text-2xl text-white tracking-widest">LATEST MIXES ON MIXCLOUD</h2>
+            <div className="rounded-xl overflow-hidden border border-white/10">
+              <iframe
+                width="100%"
+                height="400"
+                src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&feed=%2FNr1family%2F"
+                frameBorder="0"
+                allow="autoplay"
+                title="NR1 DNB Radio on Mixcloud"
+              />
+            </div>
+          </div>
+
+          {/* YouTube link */}
+          <div className="border border-white/10 rounded-xl p-6 space-y-3">
+            <h2 className="font-heading text-xl text-white tracking-widest">FULL ARCHIVE ON YOUTUBE</h2>
+            <p className="font-mono text-sm text-nr1-muted">
+              Live sessions recorded every Friday — full sets available on the channel.
+            </p>
             <a
               href="https://www.youtube.com/@nr1family420"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-nr1-cyan hover:underline"
+              className="inline-block mt-1 px-4 py-2 bg-nr1-cyan/10 border border-nr1-cyan/30 text-nr1-cyan font-mono text-sm rounded-lg hover:bg-nr1-cyan/20 transition-colors"
             >
-              YouTube
+              Visit YouTube Channel →
             </a>
-            .
-          </p>
+          </div>
+
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
