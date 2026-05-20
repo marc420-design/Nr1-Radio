@@ -7,6 +7,7 @@ import { EqualizerBars } from "./EqualizerBars";
 import { LiveBadge } from "./LiveBadge";
 import { VolumeControl } from "./VolumeControl";
 import { ShareButton } from "@/components/ui/ShareButton";
+import { MarqueeText } from "@/components/ui/MarqueeText";
 
 export function StickyPlayer() {
   const {
@@ -33,13 +34,16 @@ export function StickyPlayer() {
         </div>
 
         {/* Track info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-mono text-nr1-cyan truncate leading-none mb-0.5">
-            {artist || "NR1 DNB Radio"}
-          </p>
-          <p className="text-sm font-body text-white truncate leading-none">
-            {track || (isPlaying ? "Live Stream" : "Press play to listen")}
-          </p>
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <MarqueeText
+            text={artist || "NR1 DNB Radio"}
+            className="text-xs font-mono text-nr1-cyan leading-none mb-0.5"
+          />
+          <MarqueeText
+            text={track || (isPlaying ? "Live Stream" : "Press play to listen")}
+            className="text-sm font-body text-white leading-none"
+            delay={2000}
+          />
         </div>
 
         {/* Live badge — always visible */}

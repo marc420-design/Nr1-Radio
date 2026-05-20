@@ -33,6 +33,15 @@ body {
   background-size: 28px 28px;
 }
 
+/* ─── Marquee scroll ─────────────────────────────────────── */
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-scroll linear infinite;
+}
+
 /* ─── Equalizer animation ────────────────────────────────── */
 @keyframes eq-bar {
   0%, 100% { transform: scaleY(0.2); }
