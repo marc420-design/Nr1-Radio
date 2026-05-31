@@ -30,6 +30,9 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: `${STATION_META.name} — Live Drum & Bass`,
   description: STATION_META.description,
+  alternates: {
+    canonical: STATION_META.siteUrl,
+  },
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/icon-192.png",

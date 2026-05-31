@@ -4,8 +4,11 @@ interface ShowCardProps {
   show: ShowRow;
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-GB", {
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime()) || d.getFullYear() < 2000) return "";
+  return d.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -14,8 +17,9 @@ function formatDate(dateStr: string): string {
 
 function formatDuration(minutes: number | null): string {
   if (!minutes) return "";
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
+  const rounded = Math.round(minutes);
+  const h = Math.floor(rounded / 60);
+  const m = rounded % 60;
   return h > 0 ? `${h}h ${m > 0 ? `${m}m` : ""}`.trim() : `${m}m`;
 }
 
@@ -39,11 +43,14 @@ export function ShowCard({ show }: ShowCardProps) {
           className="block relative aspect-video bg-nr1-black overflow-hidden"
           aria-label={`Watch ${show.title} on YouTube`}
         >
+          {/* Fallback shown when thumbnail fails to load */}
+          <span className="absolute inset-0 flex items-center justify-center font-heading text-4xl text-nr1-cyan/20 tracking-widest pointer-events-none">NR1</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={thumbnailUrl}
             alt={show.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
           />
           {/* Play overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">

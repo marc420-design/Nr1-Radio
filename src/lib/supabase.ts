@@ -72,7 +72,7 @@ export interface ShowRow {
   clipping_status: string | null;
   azuracast_id: number | null;
   azuracast_path: string | null;
-  uploaded_at: string;
+  uploaded_at: string | null;
   created_at: string;
 }
 

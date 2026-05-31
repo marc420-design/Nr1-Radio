@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Use — NR1 DNB Radio",
   description: "Terms of use for NR1 DNB Radio and the NR1 DNB Radio Alexa skill.",
+  alternates: {
+    canonical: "https://listen-nr1dnb.com/terms",
+  },
 };
 
 export default function TermsPage() {

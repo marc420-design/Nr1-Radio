@@ -14,6 +14,7 @@ const DIRECTORY_LINKS = [
   { label: "MyTuner",         href: "https://mytuner-radio.com/radio/nr1-dnb-radio-518564/" },
   { label: "OnlineRadioBox",  href: "https://onlineradiobox.com/uk/nr1dnb/" },
   { label: "Radio Browser",   href: "https://www.radio-browser.info/search?name=NR1+Drum+and+Bass" },
+  { label: "InternetRadio",   href: "https://www.internet-radio.com" },
 ] as const;
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {

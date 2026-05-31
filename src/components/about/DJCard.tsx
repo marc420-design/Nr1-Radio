@@ -34,7 +34,14 @@ export function DJCard({ dj }: DJCardProps) {
       </div>
 
       <div className="p-4 space-y-3">
-        <h3 className="text-xl font-heading text-white tracking-wide">{dj.name}</h3>
+        <div>
+          <h3 className="text-xl font-heading text-white tracking-wide">{dj.name}</h3>
+          {dj.name === "J2B" && (
+            <p className="font-mono text-xs text-amber-400 tracking-widest mt-0.5 uppercase">
+              ✦ R.I.P · Founder of NR1 DNB Radio
+            </p>
+          )}
+        </div>
         {dj.bio && (
           <p className="text-sm text-white/60 line-clamp-3">{dj.bio}</p>
         )}
