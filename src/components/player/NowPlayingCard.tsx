@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 interface NowPlayingCardProps {
   track: string;
@@ -10,25 +11,31 @@ interface NowPlayingCardProps {
 
 export function NowPlayingCard({ track, artist, artwork }: NowPlayingCardProps) {
   const hasTrack = track || artist;
+  const [artError, setArtError] = useState(false);
+  useEffect(() => { setArtError(false); }, [artwork]);
 
   return (
-    <div 
+    <div
       className="flex items-center gap-3 min-w-0"
       role="region"
       aria-label="Now playing"
     >
       <div className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-nr1-grey border border-nr1-cyan/20">
-        {artwork ? (
+        {artwork && !artError ? (
           <Image
             src={artwork}
             alt={`Album art for ${track} by ${artist}`}
             fill
             className="object-cover"
+            onError={() => setArtError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
-            <span className="text-nr1-cyan font-heading text-lg">NR1</span>
-          </div>
+          <Image
+            src="/icons/icon-192.png"
+            alt="NR1 DNB Radio"
+            fill
+            className="object-cover"
+          />
         )}
       </div>
 
