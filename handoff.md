@@ -1,110 +1,143 @@
-# NR1 Radio — Session Handoff (2026-07-04)
+# NR1 Radio — Session Handoff (2026-07-04, PM)
 
 ## What shipped this session
 
-Three commits pushed to `main`:
+Commits pushed to `main` (in order):
 
-1. **`4287dc0`** — Fix pre-hydration "Offline" flash on `LiveBadge`
-   Added `hasLoaded` flag to `useNowPlaying`; badge renders a neutral "—" placeholder until first SSE/poll response resolves.
-   Files: `src/hooks/useNowPlaying.ts`, `src/contexts/PlayerContext.tsx`, `src/components/player/LiveBadge.tsx`, `src/components/player/PlayerBar.tsx`, `src/components/player/StickyPlayer.tsx`.
+1. **`8dca599`** — GitHub Actions workflow to trigger Vercel deploys on push (fallback for broken Vercel GitHub App webhook).
+2. **`ff6e303`** — Remove per-minute `show-handover` cron (audit commit `1adf927` had re-added it, blocking every Vercel Hobby deploy).
+3. **`bdf038c`** — **Delete duplicate root `middleware.ts`** — was overriding `src/middleware.ts`, causing every `/admin` request to serve the old HTTP Basic Auth response even after the new cookie-based middleware was written.
+4. **`108ec7a`** — Simplify `/admin/login` page — drop Suspense wrapper so the password form renders in initial HTML (avoids "nothing to click" if JS is slow to hydrate).
+5. **`607e394`** — Fix `archive-history` cron: AzuraCast expects ISO date strings, not epoch seconds. Cron had been erroring silently since deploy → `play_history` sat at 0 rows.
+6. **`1cccb6e`** — **`/admin/reports` page + backfill endpoint + PRS/PPL CSV export.**
+   - `src/lib/azuracast-history.ts` — shared `fetchAndUpsertHistory(startIso, endIso)` helper.
+   - `POST /api/admin/backfill-history` — chunks a date range by day, upserts to `play_history`. Cookie-auth (`admin_token`).
+   - `GET /api/admin/reports/csv` — cue-sheet CSV for a date range.
+   - `src/app/admin/reports/page.tsx` + `ReportControls.tsx` — server page with stat cards, date-range picker, results table (latest 500), CSV button, backfill button.
+7. **`6cbadee`** — Add "Notes" column to CSV auto-flagging DJ-set rows + `GET /api/admin/reports/cover-letter` for a PRS/PPL-ready plain-text cover letter.
 
-2. **`2f17745`** — Remove per-minute `show-handover` cron from `vercel.json`
-   The `* * * * *` schedule required Vercel Pro. Every deploy since **May 31** (commit `13b61aa`) had been failing silently, freezing the live site on a stale build. Six weeks of accumulated fixes deployed with this push.
-   File: `vercel.json`.
+Also done this session (out-of-band):
 
-3. **`efe1fc6`** — Tracklist schema + PRS/PPL cue-sheet CSV export
-   Files: `supabase-migration-tracklists.sql`, `src/lib/supabase.ts`, `src/app/api/reports/cue-sheet/route.ts`.
-
-## Also done (out-of-band)
-
-- **AzuraCast station config**: `station.url` set to `https://listen-nr1dnb.com` via API. Country field wouldn't accept any code (`GB`, `gb`, `UK`, `United Kingdom`, `GBR`) — likely a UI-dropdown-only field. Non-blocking.
-
----
-
-## Action items for you
-
-### 1. Run the Supabase migration
-Open Supabase Dashboard → SQL Editor → New query → paste contents of `supabase-migration-tracklists.sql` → Run.
-
-Adds to `shows` table:
-- `tracklist jsonb` — array of `{artist, title, isrc, start_time_sec, duration_sec}` objects
-- `tracklist_status text` — `missing | partial | complete`
-- Index on `tracklist_status`
-- View `shows_tracks_flat` — flattens tracklists to one row per track for CSV joins
-
-Idempotent — safe to re-run.
-
-### 1b. Add `SUPABASE_SERVICE_ROLE_KEY` and `ADMIN_PASSWORD`
-Both go in `.env.local` **and** Vercel env vars:
-- `SUPABASE_SERVICE_ROLE_KEY` — from Supabase Dashboard → Settings → API → `service_role` (⚠ full-access — server-side only, never expose)
-- `ADMIN_PASSWORD` — any string. Used to log into `/admin` (HTTP Basic Auth; leave username blank).
-
-### 1c. Seed the shows table
-Once the migration is run and the two env vars are set:
-```bash
-node scripts/seed-shows-from-azuracast.js --dry-run   # preview
-node scripts/seed-shows-from-azuracast.js             # actually write
-```
-Pulls all AzuraCast files, inserts one row per file into `shows` with `tracklist_status='missing'`. Idempotent, never overwrites an existing tracklist.
-
-### 1d. Catalogue tracklists at `/admin/tracklists`
-Log in with the `ADMIN_PASSWORD` (username blank). Click a show, paste the tracklist, save. Accepted formats:
-```
-Artist - Title
-00:00 Artist - Title
-1. Artist - Title
-Artist - Title [ISRC:GBXXX2400001]
-```
-Or a JSON array. Save marks the show `partial` or `complete` per your dropdown choice.
-
-### 2. Add `REPORT_API_KEY` to Vercel
-Vercel Dashboard → Nr1-Radio → Settings → Environment Variables → Add:
-- **Name:** `REPORT_API_KEY`
-- **Value:** `QAv7SjUxemilZ5nMAxVUvWZRPN2QOiomj0xcJ2SSpZ8`
-- **Environments:** Production (and Preview if you want)
-
-Redeploy after adding (or it will use the value on the next natural deploy).
-
-### 3. AzuraCast country code
-When you're at the AzuraCast desktop, set the country to United Kingdom via the web UI (Settings → Profile). The API wouldn't accept it.
-
----
-
-## How to pull a PRS/PPL cue sheet
-
-Once the env var and migration are in place:
-
-```bash
-curl -H "x-report-key: QAv7SjUxemilZ5nMAxVUvWZRPN2QOiomj0xcJ2SSpZ8" \
-  "https://listen-nr1dnb.com/api/reports/cue-sheet?from=2026-07-01&to=2026-07-31" \
-  -o nr1-cue-sheet-july-2026.csv
-```
-
-Or `?format=json` for a JSON response.
-
-**CSV columns:**
-`played_at_iso, played_at_epoch, show_title, show_lineup, track_artist, track_title, track_isrc, track_duration_sec, source`
-
-`source` is `azuracast_playback` (from AzuraCast history) or `show_tracklist` (from Supabase). Rows are sorted by `played_at_epoch`.
-
-**Retention gotcha:** AzuraCast history via the public API only returns the last ~10 tracks. The admin `/api/station/*/history` endpoint (used by the cue-sheet route with `AZURACAST_API_KEY`) retains longer — but confirm the retention window before you rely on it monthly. Consider a scheduled export to Supabase/S3 if needed.
-
----
-
-## Still open for PRS/PPL submission
-
-- **Populate the `shows` table with tracklists.** Currently 0 rows. The 150 archive mixes need to be inserted with tracklists per show. This is the manual DJ-chase step and is the single biggest blocker to submission.
-- **Legal entity on the site.** Currently no company name / sole-trader details on the footer, terms, or privacy pages. PRS/PPL registration will need this. User deferred this decision — pick sole trader vs Ltd when ready.
-- **ISRC codes on the archive files.** Every one of the 150 files has `isrc=""` in AzuraCast. Non-fatal (PPL falls back to title/artist matching) but reduces royalty-attribution accuracy for the tracks *inside* the mixes, when you populate tracklists.
-
-**Rough remaining scope:** ~1 week if you go sole-trader + sample reporting; ~2+ weeks if full monthly cue sheets across all 150 archive shows.
+- **Vercel GitHub App permissions accepted** — `Actions (read)` + `Workflows (read & write)`. Vercel had been silently missing every push since a permissions bump. Reviewed & approved at `github.com/settings/installations/115471577`.
+- **Vercel CLI logged in** locally (marc420-design). `.vercel/project.json` linked to `marc420-designs-orgs-projects/nr1-radio`.
+- **60-day history backfill run** — 803 tracks inserted into `play_history` covering 2026-05-10 → 2026-07-04. Confirmed no AzuraCast history exists prior to 2026-05-10 (retention limit on the server).
 
 ---
 
 ## Live state at handoff
 
-- **Site:** listen-nr1dnb.com — live, running the newest bundle (commit `efe1fc6` deploying).
-- **AzuraCast:** online, 3 listeners, playing `NR1 LIVE SHOW 2026-04-24`.
-- **GitHub:** `main` @ `efe1fc6`, working tree clean.
-- **Supabase:** unchanged — migration file staged locally, not yet run.
-- **Vercel:** `REPORT_API_KEY` not yet added to env vars — cue-sheet endpoint will 401 until you add it.
+- **Site**: https://listen-nr1dnb.com — live, latest bundle from `6cbadee`.
+- **Admin**: `/admin` behind cookie-auth (`ADMIN_PASSWORD=nr1admin2026`). Login form renders in initial HTML.
+- **Archive cron**: fixed, runs `0 2 * * *` UTC daily.
+- **`play_history`**: 803 rows, backfilled from AzuraCast.
+- **Vercel deploys**: auto-deploy from `main` should work again now that the GitHub App has its new permissions. The `deploy.yml` GitHub Action is kept as a belt-and-braces fallback.
+- **GitHub**: `main` @ `6cbadee`, working tree clean.
+
+---
+
+## Stack quick-reference
+
+- Next.js 16.1.6 (App Router, Turbopack, React Compiler), Tailwind v4 (CSS `@theme` in `globals.css` — no `tailwind.config.ts`).
+- Supabase: `chat_messages`, `djs`, `schedule`, `events`, `shows`, **`play_history`** (new-ish, admin-only via service role).
+- AzuraCast at `radio.listen-nr1dnb.com`, station `nr1_dnb_radio`.
+- Vercel Hobby — **all crons must be daily or slower** (`* * * * *` per-minute rejects at deploy time).
+
+---
+
+## Deploy notes (important — read before shipping)
+
+- `vercel --prod --yes` from the project root works (CLI is logged in, `.vercel/` linked).
+- Auto-deploy from GitHub `main` should also work now that Vercel's GitHub App has been re-approved. If it silently stops again, check `github.com/settings/installations/115471577` for a new "Permission updates requested" flag.
+- **Never re-introduce a `middleware.ts` at the repo root.** Next.js resolves that first and it will silently override `src/middleware.ts`.
+- **Never add a `* * * * *` cron to `vercel.json`.** Hobby rejects it, which fails the whole deploy.
+
+---
+
+## Environment variables (Vercel, production)
+
+| Key | Set? | Notes |
+|---|---|---|
+| `ADMIN_PASSWORD` | ✓ | `nr1admin2026` — cookie value for `/admin` auth |
+| `CRON_SECRET` | ✓ | Bearer token Vercel Cron sends to `/api/cron/*` |
+| `AZURACAST_API_KEY` | ✓ | `1b9333008bfa7147:12de2bb80b0b575ef4e06ee5d5379d3a` |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✓ | Server-only; bypasses RLS |
+| `NEXT_PUBLIC_AZURACAST_BASE_URL` | ✓ | `https://radio.listen-nr1dnb.com` |
+| `NEXT_PUBLIC_STATION_ID` | ✓ | `nr1_dnb_radio` |
+| `NEXT_PUBLIC_STATION_SHORTCODE` | ✓ | `nr1_dnb_radio` |
+| `NEXT_PUBLIC_SUPABASE_URL` | ✓ | |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✓ | |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | ✓ | |
+
+---
+
+## PRS/PPL prep
+
+Owner has **not applied for a licence yet** — collecting data now so historical reporting is available when they do. Everything needed is in place:
+
+- **`play_history` table** — every track AzuraCast plays, upserted nightly at 2 AM UTC.
+- **`/admin/reports`** — date-range picker, results table, `DOWNLOAD CSV`, `COVER LETTER`, `RUN BACKFILL`.
+- **CSV format** — Broadcast Date, Time UTC, Duration, Title, Artist, ISRC, Playlist, Streamer, **Notes**. DJ-set rows auto-flagged in Notes.
+- **Cover letter** — plain-text template naming the station + reporting period, and explaining that DJ-set rows are continuous mixes, not individual tracks.
+
+When they apply, likely licences:
+- PPL Small Broadcaster Radio (~£220/yr).
+- PRS Limited Online Music Licence (LOML) or Small Webcaster Tariff (listener-hours based).
+- Reporting is typically quarterly and only for the licensed period.
+
+---
+
+## Audit feedback (user reviewed the live site)
+
+**Resolved / verified:**
+- Stream URL — verified `206 Partial Content` / `audio/mpeg`, 100 KB in <8s. Working.
+- Footer "Contact" — already `mailto:nr1family420@gmail.com` in `SiteChrome.tsx:85`. Crawler false positive.
+- Admin login — now works, form visible in initial HTML.
+
+**Still open (need user input or a device):**
+- Manual playback QA in VLC + Chrome + mobile data + Alexa.
+- Schedule truth-check — Listen page says "Live Fridays" but `/schedule` shows many weekly slots. Owner needs to confirm current live times before advertising.
+- DJ bios — some residents have full descriptions, others are name-only. Need content pass: role, real/artist name, style, socials, latest show link.
+- Privacy/Terms detail pass — cover live chat, Umami analytics, embedded players, directory listings, third-party data flow.
+- AzuraCast physical: disk 75% full, 135 files still to upload, nginx `413` blocking large uploads. Fix at the desktop when convenient (disk expand + `client_max_body_size` bump + `nr1upload` SFTP on port 2022 needs the router port-forward).
+
+---
+
+## Suggested upgrades (all zero-cost, user is between funding rounds)
+
+**Reliability tier (protect what exists):**
+1. UptimeRobot free tier pinging site + stream.
+2. Sentry free tier (5k errors/mo).
+3. Supabase nightly JSON backup → Vercel Blob.
+4. `/api/health` endpoint (Supabase + AzuraCast reachable).
+
+**Growth tier:**
+5. Podcast RSS feed exposing the AzuraCast archive → submittable to Spotify / Apple Podcasts / Pocket Casts.
+6. PWA Web Push notifications ("DJ X is live now").
+7. "Recently played" homepage widget from `play_history`.
+8. Now-playing → Discord webhook.
+
+**Content tier:**
+9. Populate the `shows` table (currently 0 rows) and build a proper `/shows` archive listing.
+10. Per-DJ play-count / broadcast-hours stats on DJ profile pages.
+
+User to pick which bundle to start with. Reliability trio is the highest-leverage.
+
+---
+
+## Files worth knowing about (added / changed this session)
+
+```
+src/middleware.ts                                 (cookie-auth for /admin)
+src/app/admin/login/page.tsx                      (simplified, no Suspense)
+src/app/admin/reports/page.tsx                    (new — server component)
+src/app/admin/reports/ReportControls.tsx          (new — client controls)
+src/app/api/admin/backfill-history/route.ts       (new — POST, cookie-auth)
+src/app/api/admin/reports/csv/route.ts            (new — GET, cookie-auth)
+src/app/api/admin/reports/cover-letter/route.ts   (new — GET, cookie-auth)
+src/app/api/cron/archive-history/route.ts         (uses shared helper)
+src/lib/azuracast-history.ts                      (new — shared helper)
+vercel.json                                       (per-minute cron removed)
+.github/workflows/deploy.yml                      (fallback deploy trigger)
+```
+
+Deleted: root `middleware.ts` (was the old HTTP Basic Auth version, was overriding `src/middleware.ts`).
