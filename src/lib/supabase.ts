@@ -62,6 +62,14 @@ export interface ChatMessage {
   color: string;
 }
 
+export interface TracklistEntry {
+  artist: string;
+  title: string;
+  isrc?: string;
+  start_time_sec?: number;
+  duration_sec?: number;
+}
+
 export interface ShowRow {
   id: string;
   youtube_id: string;
@@ -74,6 +82,8 @@ export interface ShowRow {
   azuracast_path: string | null;
   uploaded_at: string | null;
   created_at: string;
+  tracklist: TracklistEntry[] | null;
+  tracklist_status: "missing" | "partial" | "complete" | null;
 }
 
 export interface EventRow {
