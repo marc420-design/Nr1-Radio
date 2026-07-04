@@ -41,6 +41,7 @@ export default async function AboutPage() {
         <div className="mt-8 flex flex-wrap gap-3">
           {[
             { label: "Facebook",   href: SOCIAL_LINKS.facebook },
+            { label: "Instagram",  href: SOCIAL_LINKS.instagram },
             { label: "YouTube",    href: SOCIAL_LINKS.youtube },
             { label: "Mixcloud",   href: SOCIAL_LINKS.mixcloud },
             { label: "SoundCloud", href: SOCIAL_LINKS.soundcloud },

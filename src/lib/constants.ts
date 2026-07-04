@@ -16,6 +16,7 @@ export const DIRECT_STREAM_URL = `${AZURACAST_BASE_URL}/listen/${STATION_SHORTCO
 // ─── Social / contact ─────────────────────────────────────────────────────────
 export const SOCIAL_LINKS = {
   facebook:   "https://www.facebook.com/nr1dnb/",
+  instagram:  "https://www.instagram.com/nr1dnb/",
   youtube:    "https://www.youtube.com/@nr1family420",
   mixcloud:   "https://www.mixcloud.com/Nr1family/",
   tiktok:     "https://www.tiktok.com/@nr1dnb",
