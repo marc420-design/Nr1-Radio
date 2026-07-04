@@ -13,7 +13,7 @@ export function StickyPlayer() {
   const {
     play, pause, setVolume, toggleMute,
     isPlaying, isMuted, volume, status,
-    track, artist, artwork, isLive, isOnline, listenerCount,
+    track, artist, artwork, isLive, isOnline, listenerCount, hasLoaded,
   } = usePlayer();
 
   const isLoading = status === "loading" || status === "reconnecting";
@@ -48,7 +48,7 @@ export function StickyPlayer() {
 
         {/* Live badge — always visible */}
         <div className="shrink-0">
-          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
+          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} hasLoaded={hasLoaded} />
         </div>
 
         {/* Listener count — mobile shows count only, sm+ shows equalizer + count */}

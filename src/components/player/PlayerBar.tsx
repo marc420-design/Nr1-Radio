@@ -14,13 +14,13 @@ import { ShareButton } from "@/components/ui/ShareButton";
  * The persistent sticky bottom bar (StickyPlayer) is rendered in the root layout.
  */
 export function PlayerBar() {
-  const { play, pause, setVolume, toggleMute, isPlaying, isMuted, volume, status, track, artist, artwork, isLive, isOnline, listenerCount, uniqueListeners } = usePlayer();
+  const { play, pause, setVolume, toggleMute, isPlaying, isMuted, volume, status, track, artist, artwork, isLive, isOnline, listenerCount, uniqueListeners, hasLoaded } = usePlayer();
 
   return (
     <div className="flex justify-center w-full">
       <div className="player-card flex flex-col items-center gap-6 py-6 px-5 sm:py-10 sm:px-12 w-full max-w-md">
         <div className="flex items-center gap-4">
-          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} />
+          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} hasLoaded={hasLoaded} />
           <EqualizerBars isPlaying={isPlaying} />
         </div>
         <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />

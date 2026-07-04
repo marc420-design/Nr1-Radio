@@ -6,9 +6,24 @@ interface LiveBadgeProps {
   isLive: boolean;
   isOnline: boolean;
   status: StreamStatus;
+  hasLoaded?: boolean;
 }
 
-export function LiveBadge({ isLive, isOnline, status }: LiveBadgeProps) {
+export function LiveBadge({ isLive, isOnline, status, hasLoaded = true }: LiveBadgeProps) {
+  if (!hasLoaded) {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-nr1-muted/10 text-nr1-muted/70 border border-nr1-muted/20"
+        role="status"
+        aria-label="Station status: Loading"
+        aria-live="polite"
+      >
+        <span className="w-2 h-2 rounded-full bg-nr1-muted/50" aria-hidden="true" />
+        —
+      </span>
+    );
+  }
+
   if (status === "reconnecting") {
     return (
       <span 

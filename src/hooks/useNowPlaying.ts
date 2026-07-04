@@ -14,6 +14,7 @@ interface NowPlayingState {
   uniqueListeners: number;
   history: HistoryEntry[];
   isOnline: boolean;
+  hasLoaded: boolean;
 }
 
 const DEFAULT_STATE: NowPlayingState = {
@@ -26,6 +27,7 @@ const DEFAULT_STATE: NowPlayingState = {
   uniqueListeners: 0,
   history: [],
   isOnline: false,
+  hasLoaded: false,
 };
 
 function parseNowPlaying(data: NowPlayingData): NowPlayingState {
@@ -39,6 +41,7 @@ function parseNowPlaying(data: NowPlayingData): NowPlayingState {
     uniqueListeners: data.listeners.unique,
     history: data.song_history ?? [],
     isOnline: data.is_online,
+    hasLoaded: true,
   };
 }
 
