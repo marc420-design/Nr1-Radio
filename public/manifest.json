@@ -1,7 +1,7 @@
 {
   "name": "NR1 DNB Radio",
   "short_name": "NR1 Radio",
-  "description": "Norwich's finest drum & bass radio station. Listen live 24/7.",
+  "description": "Norwich's underground drum & bass radio station. Listen live 24/7.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

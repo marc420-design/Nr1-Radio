@@ -2,7 +2,7 @@
 
 **Live at:** [listen-nr1dnb.com](https://listen-nr1dnb.com)
 
-Norwich's underground drum & bass radio station. Live Friday sessions, 24/7 stream, 30+ DJs. Est. 2018.
+Norwich's underground drum & bass radio station. Live Friday sessions, 24/7 stream, 20+ DJs & MCs. Est. 2018.
 
 ---
 
