@@ -7,7 +7,7 @@ import { LiveChat } from "@/components/chat/LiveChat";
 
 export const metadata: Metadata = {
   title: "Listen — NR1 DNB Radio",
-  description: "Listen live to NR1 DNB Radio on Alexa, TuneIn, or in your browser. Norwich's finest drum & bass station.",
+  description: "Listen live to NR1 DNB Radio on Alexa, TuneIn, or in your browser. Norwich's underground drum & bass station.",
   alternates: {
     canonical: "https://listen-nr1dnb.com/listen",
   },

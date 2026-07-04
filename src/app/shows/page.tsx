@@ -5,7 +5,7 @@ import type { ShowRow } from "@/lib/supabase";
 
 export const metadata: Metadata = {
   title: "Shows — NR1 DNB Radio",
-  description: "Archive of NR1 DNB Radio shows and DJ sets. Drum & bass mixes from Norwich's finest crew.",
+  description: "Archive of NR1 DNB Radio shows and DJ sets. Drum & bass mixes from Norwich's underground crew.",
   alternates: {
     canonical: "https://listen-nr1dnb.com/shows",
   },
