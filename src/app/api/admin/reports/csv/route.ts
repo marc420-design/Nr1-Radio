@@ -43,13 +43,19 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const header = ["Broadcast Date", "Broadcast Time (UTC)", "Duration", "Track Title", "Artist", "ISRC", "Playlist", "Streamer"];
+  const header = ["Broadcast Date", "Broadcast Time (UTC)", "Duration", "Track Title", "Artist", "ISRC", "Playlist", "Streamer", "Notes"];
   const lines = [header.join(",")];
+
+  const DJ_SET_NOTE = "DJ mix/set — individual tracks within the mix are not separately identifiable.";
 
   for (const r of data ?? []) {
     const dt = new Date(r.played_at as string);
     const date = dt.toISOString().slice(0, 10);
     const time = dt.toISOString().slice(11, 19);
+    const playlist = (r.playlist as string | null) ?? "";
+    const isDjSet = /dj|mix|set|live/i.test(playlist) || /dj|mix|set|live show/i.test((r.song_title as string | null) ?? "");
+    const note = isDjSet ? DJ_SET_NOTE : "";
+
     lines.push([
       csvEscape(date),
       csvEscape(time),
@@ -59,6 +65,7 @@ export async function GET(req: NextRequest) {
       csvEscape(r.song_isrc as string | null),
       csvEscape(r.playlist as string | null),
       csvEscape(r.streamer as string | null),
+      csvEscape(note),
     ].join(","));
   }
 

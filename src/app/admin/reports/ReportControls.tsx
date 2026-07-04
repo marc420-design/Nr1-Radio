@@ -19,6 +19,10 @@ export function ReportControls({ initialFrom, initialTo }: { initialFrom: string
     window.location.href = `/api/admin/reports/csv?from=${from}&to=${to}`;
   }
 
+  function downloadCoverLetter() {
+    window.location.href = `/api/admin/reports/cover-letter?from=${from}&to=${to}`;
+  }
+
   async function runBackfill() {
     if (!confirm(`Backfill from ${from} to ${to}? This may take a while for large ranges.`)) return;
     setBackfilling(true);
@@ -79,7 +83,19 @@ export function ReportControls({ initialFrom, initialTo }: { initialFrom: string
           >
             DOWNLOAD CSV
           </button>
+          <button
+            type="button"
+            onClick={downloadCoverLetter}
+            className="border border-nr1-cyan text-nr1-cyan font-heading tracking-widest px-5 py-2 rounded hover:bg-nr1-cyan/10"
+          >
+            COVER LETTER
+          </button>
         </form>
+        <p className="text-[11px] font-mono text-nr1-muted">
+          CSV: cue-sheet with a Notes column marking DJ mixes/sets. Cover letter:
+          plain-text explanation for PRS/PPL confirming that DJ-set entries represent
+          continuous mixes rather than individually reportable tracks.
+        </p>
       </div>
 
       <div className="rounded border border-amber-400/30 bg-nr1-grey/40 p-4 space-y-3">
