@@ -32,6 +32,7 @@ export default async function AdminHomePage() {
       <section className="space-y-2">
         <h2 className="font-heading text-lg text-white tracking-widest">SHORTCUTS</h2>
         <ul className="text-sm space-y-1">
+          <li><Link href="/admin/reports" className="text-nr1-cyan hover:underline">→ Reports</Link> — broadcast play history, backfill & PRS/PPL CSV export</li>
           <li><Link href="/admin/tracklists" className="text-nr1-cyan hover:underline">→ Tracklists</Link> — catalog show tracklists for PRS/PPL cue sheets</li>
         </ul>
       </section>
