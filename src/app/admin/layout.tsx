@@ -15,6 +15,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             NR1 ADMIN
           </Link>
           <nav className="flex gap-4 text-xs font-mono text-nr1-muted">
+            <Link href="/admin/shows" className="hover:text-nr1-cyan">SHOWS</Link>
             <Link href="/admin/tracklists" className="hover:text-nr1-cyan">TRACKLISTS</Link>
             <Link href="/admin/reports" className="hover:text-nr1-cyan">REPORTS</Link>
           </nav>

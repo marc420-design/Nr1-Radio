@@ -1,6 +1,82 @@
-# NR1 Radio — Session Handoff (2026-07-04, PM)
+# NR1 Radio — Session Handoff (2026-07-05)
 
 ## What shipped this session
+
+Commits pushed to `main` (in order):
+
+1. **`2b9a442`** — Align README + PWA manifest with canonical directory metadata.
+   - `README.md`: fix "30+ DJs" → "20+ DJs & MCs" (only stale surface — the rest of the codebase already used 20+).
+   - `public/manifest.json`: "Norwich's finest" → "Norwich's underground" so PWA install prompt matches the site's own positioning.
+2. **`680ccda`** — Align remaining page metadata to canonical "underground" copy.
+   - `/listen` and `/shows` page meta descriptions still said "Norwich's finest" — swapped to "underground". Every page-level SEO description, PWA manifest, and `station.ts` now agree.
+
+Live-site verified after each push (`curl <url> | grep 'meta name="description"'`).
+
+### Built locally (not yet committed) — video player for one-hour DnB sets
+
+Full feature: video player for uploading one-hour special sets on a takedown-resistant host (**Bunny.net Stream** — YouTube's Content ID has been taking NR1's sets down). Paste-URL-in-admin flow, dedicated `/shows/[id]` detail pages.
+
+**Files added (new):**
+```
+src/lib/bunny.ts                              (URL helpers + GUID parser)
+src/components/shows/BunnyVideoPlayer.tsx     (responsive iframe wrapper)
+src/app/shows/[id]/page.tsx                   (server-rendered detail page with OG, tracklist)
+src/app/shows/[id]/not-found.tsx              (404 fallback)
+src/app/admin/shows/page.tsx                  (admin list with source badges)
+src/app/admin/shows/new/page.tsx              (paste-URL form)
+src/app/admin/shows/new/actions.ts            (createShowAction server action)
+supabase-migration-video.sql                  (Bunny columns migration)
+```
+
+**Files modified:**
+```
+supabase-schema.sql                           (Bunny columns + youtube_id nullable)
+src/lib/supabase.ts                           (ShowRow type — bunny_video_id, description, youtube_id nullable)
+src/components/shows/ShowCard.tsx             (links to internal /shows/[id], prefers Bunny thumbnail)
+src/app/admin/layout.tsx                      (SHOWS nav entry added)
+.env.local                                    (Bunny env vars — see below)
+```
+
+**Environment work (done — no code needed):**
+- Bunny.net account created + email verified.
+- Stream Library **NR1 DNB Shows** created — **Library ID `697346`**, **CDN hostname `vz-d1e185a9-bda.b-cdn.net`**.
+- Delivery tier: **High Volume** ($5/TB, ideal for hour-long video).
+- `$20` trial credit + 14-day trial active.
+- **`NEXT_PUBLIC_BUNNY_STREAM_LIBRARY_ID`** + **`NEXT_PUBLIC_BUNNY_STREAM_CDN_HOSTNAME`** set in both `.env.local` and Vercel Production.
+
+**Supabase migration applied** (SQL run via dashboard):
+- `youtube_id` → nullable
+- `bunny_video_id text` added, indexed
+- `description text` added
+- Column comments set
+- **Important finding:** `shows` table has **246 rows** from AzuraCast seed (used by tracklists / PRS-PPL reports, no video source). Original plan had a check constraint requiring `youtube_id OR bunny_video_id` — dropped it, would have broken those rows. Validation happens in `createShowAction` for user-created rows instead.
+
+### Directory-discoverability audit (paused)
+
+Full audit + two-week rollout plan drafted at `~/.claude/plans/nr1-dnb-discoverability-zazzy-planet.md`. Started the myTuner claim in-browser (confirmed listing id `518564` publicly exposes home address `61 Lionwood Road, Norwich, NR1 4PT`). **All directory claim/edit work paused** until PRS WMLO + PPL webcaster licences are in place — user's call, sensible.
+
+---
+
+## What's left immediately
+
+1. **Commit + push the video-player code** — 8 new files + 5 modified. Not yet on `main`.
+2. **Upload one test video to Bunny Stream** via `dash.bunny.net/stream/697346`. Copy the video GUID.
+3. **Smoke-test end-to-end**: `/admin/shows/new` → paste GUID → submit → `/shows/[id]` should load with player + OG meta.
+4. **Verify Vercel Production deploy** picks up both the code and the new env vars — the `NEXT_PUBLIC_*` names mean they need to be present at build time.
+
+## Discoverability rollout — waiting on licences
+
+Do **not** proactively claim/edit any directory listings (myTuner, TuneIn, radio.net, Streema/Simple Radio, Online Radio Box, Radio UK, LiveRadioUK, Radio Garden, Radio Browser, Internet-Radio.com) until user confirms PRS WMLO + PPL webcaster licences are in place. Directory reviewers don't check licensing, but user does not want to raise NR1's profile until legally clean.
+
+Priority when unblocked: **strip the public street address from myTuner listing 518564 first**.
+
+---
+
+## Prior session
+
+# NR1 Radio — Session Handoff (2026-07-04, PM)
+
+### What shipped that session
 
 Commits pushed to `main` (in order):
 

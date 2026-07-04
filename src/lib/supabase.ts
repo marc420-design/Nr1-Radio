@@ -72,9 +72,11 @@ export interface TracklistEntry {
 
 export interface ShowRow {
   id: string;
-  youtube_id: string;
+  youtube_id: string | null;
+  bunny_video_id: string | null;
   title: string;
   lineup: string | null;
+  description: string | null;
   duration_min: number | null;
   lufs: number | null;
   clipping_status: string | null;

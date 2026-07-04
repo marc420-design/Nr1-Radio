@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import type { ShowRow } from "@/lib/supabase";
-
+import { bunnyThumbnailUrl, isBunnyConfigured } from "@/lib/bunny";
 
 interface ShowCardProps {
   show: ShowRow;
@@ -27,37 +28,37 @@ function formatDuration(minutes: number | null): string {
   return h > 0 ? `${h}h ${m > 0 ? `${m}m` : ""}`.trim() : `${m}m`;
 }
 
-export function ShowCard({ show }: ShowCardProps) {
-  const youtubeUrl = show.youtube_id
-    ? `https://www.youtube.com/watch?v=${show.youtube_id}`
-    : null;
+function resolveThumbnail(show: ShowRow): string | null {
+  if (show.bunny_video_id && isBunnyConfigured()) return bunnyThumbnailUrl(show.bunny_video_id);
+  if (show.youtube_id) return `https://img.youtube.com/vi/${show.youtube_id}/mqdefault.jpg`;
+  return null;
+}
 
-  const thumbnailUrl = show.youtube_id
-    ? `https://img.youtube.com/vi/${show.youtube_id}/mqdefault.jpg`
-    : null;
+export function ShowCard({ show }: ShowCardProps) {
+  const href = `/shows/${show.id}`;
+  const thumbnailUrl = resolveThumbnail(show);
 
   return (
     <div className="rounded-xl border border-white/10 bg-nr1-grey/40 overflow-hidden hover:border-nr1-cyan/30 transition-colors group">
-      {/* Thumbnail */}
       {thumbnailUrl ? (
-        <a
-          href={youtubeUrl!}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href={href}
           className="block relative aspect-video bg-nr1-black overflow-hidden"
-          aria-label={`Watch ${show.title} on YouTube`}
+          aria-label={`Watch ${show.title}`}
         >
-          {/* Fallback shown when thumbnail fails to load */}
-          <span className="absolute inset-0 flex items-center justify-center font-heading text-4xl text-nr1-cyan/20 tracking-widest pointer-events-none">NR1</span>
+          <span className="absolute inset-0 flex items-center justify-center font-heading text-4xl text-nr1-cyan/20 tracking-widest pointer-events-none">
+            NR1
+          </span>
           <Image
             src={thumbnailUrl}
             alt={show.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.opacity = "0";
+            }}
           />
-          {/* Play overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="w-12 h-12 rounded-full bg-nr1-cyan/90 flex items-center justify-center">
               <svg className="w-5 h-5 text-nr1-black ml-0.5" viewBox="0 0 24 24" fill="currentColor">
@@ -65,18 +66,19 @@ export function ShowCard({ show }: ShowCardProps) {
               </svg>
             </div>
           </div>
-        </a>
+        </Link>
       ) : (
-        <div className="aspect-video bg-nr1-black flex items-center justify-center">
+        <Link href={href} className="block aspect-video bg-nr1-black flex items-center justify-center">
           <span className="font-heading text-4xl text-nr1-cyan/20 tracking-widest">NR1</span>
-        </div>
+        </Link>
       )}
 
-      {/* Info */}
       <div className="p-4 space-y-2">
-        <h3 className="font-heading text-lg text-white tracking-wide leading-tight line-clamp-2">
-          {show.title}
-        </h3>
+        <Link href={href} className="block">
+          <h3 className="font-heading text-lg text-white tracking-wide leading-tight line-clamp-2 group-hover:text-nr1-cyan transition-colors">
+            {show.title}
+          </h3>
+        </Link>
 
         {show.lineup && (
           <p className="font-mono text-xs text-nr1-cyan truncate">{show.lineup}</p>
@@ -91,20 +93,6 @@ export function ShowCard({ show }: ShowCardProps) {
             </>
           )}
         </div>
-
-        {youtubeUrl && (
-          <a
-            href={youtubeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-mono text-nr1-muted hover:text-nr1-cyan transition-colors mt-1"
-          >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-            </svg>
-            Watch on YouTube
-          </a>
-        )}
       </div>
     </div>
   );

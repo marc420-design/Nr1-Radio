@@ -85,12 +85,15 @@ create trigger trg_purge_chat
 after insert on chat_messages
 execute function purge_old_chat_messages();
 
--- Shows archive (uploaded from AzuraCast media library)
+-- Shows archive — video-on-demand DJ sets. Preferred host: Bunny.net Stream.
+-- YouTube column kept nullable for legacy rows (YouTube deprecated due to Content ID takedowns).
 create table if not exists shows (
   id               uuid primary key default gen_random_uuid(),
-  youtube_id       text unique not null,
+  youtube_id       text unique,             -- legacy; nullable
+  bunny_video_id   text,                    -- Bunny.net Stream video GUID (preferred)
   title            text not null,           -- e.g. "NR1 LIVE SHOW"
   lineup           text,                    -- e.g. "DJ TUFF KUTS, MC CONTAGIOUS"
+  description      text,                    -- long-form for detail page + OG
   duration_min     numeric,
   lufs             numeric,
   clipping_status  text,                    -- 'OK' or 'CLIPPING_RISK'
