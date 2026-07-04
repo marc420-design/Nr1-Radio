@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "https",
+        hostname: "img.youtube.com",
+        pathname: "/vi/**",
+      },
+      {
         protocol: "http",
         hostname: "radio.listen-nr1dnb.com",
         pathname: "/**",

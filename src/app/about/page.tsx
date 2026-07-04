@@ -94,6 +94,41 @@ export default async function AboutPage() {
             View the crew →
           </a>
         </div>
+
+        {/* Station info / operator details */}
+        <div className="mt-8 rounded-xl border border-white/10 bg-nr1-grey p-5 space-y-3">
+          <h3 className="font-heading text-xl text-white">Station Details</h3>
+          <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-2 font-mono text-sm text-white/60">
+            <div>
+              <dt className="text-nr1-muted text-xs uppercase tracking-widest">Operator</dt>
+              <dd>NR1 DNB Radio</dd>
+            </div>
+            <div>
+              <dt className="text-nr1-muted text-xs uppercase tracking-widest">Location</dt>
+              <dd>Norwich, UK</dd>
+            </div>
+            <div>
+              <dt className="text-nr1-muted text-xs uppercase tracking-widest">Established</dt>
+              <dd>2018</dd>
+            </div>
+            <div>
+              <dt className="text-nr1-muted text-xs uppercase tracking-widest">Broadcast</dt>
+              <dd>Internet radio · 24/7</dd>
+            </div>
+            <div>
+              <dt className="text-nr1-muted text-xs uppercase tracking-widest">Genre</dt>
+              <dd>Drum &amp; Bass</dd>
+            </div>
+            <div>
+              <dt className="text-nr1-muted text-xs uppercase tracking-widest">Contact</dt>
+              <dd>
+                <a href="mailto:nr1family420@gmail.com" className="text-nr1-cyan hover:underline">
+                  nr1family420@gmail.com
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </div>
       </section>
     </div>
   );

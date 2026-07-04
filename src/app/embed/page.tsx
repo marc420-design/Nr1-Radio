@@ -8,7 +8,6 @@ export default function EmbedPage() {
 
   return (
     <>
-      <meta name="robots" content="noindex" />
       <div className="flex items-center justify-center min-h-screen bg-nr1-black">
         <div className="player-card flex flex-col items-center gap-4 py-8 px-10 w-full max-w-xs">
           <p className="font-heading text-xl text-nr1-cyan tracking-widest">NR1 DNB RADIO</p>

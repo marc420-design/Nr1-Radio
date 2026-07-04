@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/reset-chat",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/show-handover",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/archive-history",
+      "schedule": "0 2 * * *"
     }
   ]
 }

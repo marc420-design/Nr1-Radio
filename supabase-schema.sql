@@ -103,6 +103,28 @@ create table if not exists shows (
 alter table shows enable row level security;
 create policy "Public read shows" on shows for select using (true);
 
+-- Play history archive (populated by /api/cron/archive-history — runs daily)
+-- Used for PPL/PRS cue sheets for date ranges older than AzuraCast's live history window
+create table if not exists play_history (
+  id              uuid primary key default gen_random_uuid(),
+  played_at       timestamptz not null,
+  played_at_epoch bigint not null,
+  song_artist     text,
+  song_title      text,
+  song_isrc       text,
+  duration_sec    integer,
+  playlist        text,
+  streamer        text,
+  source          text default 'azuracast',
+  created_at      timestamptz default now(),
+  unique (played_at_epoch, song_title, song_artist)
+);
+
+alter table play_history enable row level security;
+-- No public read — admin only via service role key
+
+create index if not exists play_history_played_at_idx on play_history (played_at);
+
 -- Sample data (optional — remove before production)
 insert into schedule (show_name, dj_name, day_of_week, start_time, end_time, show_type) values
   ('Friday Night Sessions', 'DJ Example', 4, '20:00', '22:00', 'live'),

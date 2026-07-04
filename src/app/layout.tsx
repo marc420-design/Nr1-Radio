@@ -54,6 +54,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@Nr1Family",
     title: STATION_META.name,
     description: STATION_META.description,
     images: ["https://listen-nr1dnb.com/og-image.png"],
