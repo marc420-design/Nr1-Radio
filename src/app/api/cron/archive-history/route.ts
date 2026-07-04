@@ -32,10 +32,10 @@ export async function GET(req: NextRequest) {
   const endOfYesterday = new Date(yesterday);
   endOfYesterday.setUTCHours(23, 59, 59, 999);
 
-  const fromEpoch = Math.floor(yesterday.getTime() / 1000);
-  const toEpoch = Math.floor(endOfYesterday.getTime() / 1000);
+  const startIso = yesterday.toISOString();
+  const endIso = endOfYesterday.toISOString();
 
-  const url = `${BASE_URL}/api/station/${STATION_ID}/history?start=${fromEpoch}&end=${toEpoch}`;
+  const url = `${BASE_URL}/api/station/${STATION_ID}/history?start=${encodeURIComponent(startIso)}&end=${encodeURIComponent(endIso)}`;
   const res = await fetch(url, {
     headers: { "X-API-Key": apiKey },
     signal: AbortSignal.timeout(20000),
