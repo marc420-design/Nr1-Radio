@@ -2,6 +2,7 @@
 
 import type { ShowRow } from "@/lib/supabase";
 
+
 interface ShowCardProps {
   show: ShowRow;
 }
