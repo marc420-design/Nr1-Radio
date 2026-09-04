@@ -5,7 +5,18 @@ interface DJCardProps {
   dj: DJRow;
 }
 
+function formatJoinedDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-GB", {
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export function DJCard({ dj }: DJCardProps) {
+  const joinedDate = formatJoinedDate(dj.created_at);
+
   return (
     <div className="rounded-xl border border-white/10 bg-nr1-grey overflow-hidden group hover:border-nr1-cyan/40 hover:shadow-[0_0_20px_rgba(0,229,255,0.08)] transition-all duration-300">
       <div className="relative h-64 bg-nr1-black">
@@ -36,6 +47,11 @@ export function DJCard({ dj }: DJCardProps) {
       <div className="p-4 space-y-3">
         <div>
           <h3 className="text-xl font-heading text-white tracking-wide">{dj.name}</h3>
+          {joinedDate && (
+            <p className="font-mono text-[11px] text-nr1-muted uppercase tracking-widest mt-0.5">
+              Crew since {joinedDate}
+            </p>
+          )}
           {dj.name === "J2B" && (
             <p className="font-mono text-xs text-amber-400 tracking-widest mt-0.5 uppercase">
               ✦ R.I.P · Founder of NR1 DNB Radio

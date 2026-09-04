@@ -6,8 +6,8 @@ import type { DJRow } from "@/lib/supabase";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "DJs & MCs — NR1 DNB Radio",
-  description: "Meet the 20+ DJs and MCs behind NR1 Drum and Bass Radio. Norwich's underground DNB crew, broadcasting live since 2018.",
+  title: "DJs & MCs - NR1 DNB Radio",
+  description: "Meet the 26 DJs and MCs behind NR1 Drum and Bass Radio. Norwich's underground DNB crew, broadcasting live since 2018.",
   alternates: {
     canonical: "https://listen-nr1dnb.com/djs",
   },
@@ -26,23 +26,21 @@ export default async function DJsPage() {
 
     const all = (data as DJRow[]) ?? [];
     residents = all.filter((dj) => dj.is_resident);
-    guests    = all.filter((dj) => !dj.is_resident);
+    guests = all.filter((dj) => !dj.is_resident);
   } catch {
-    // Supabase not configured — show empty state
+    // Supabase not configured - show empty state
   }
 
   const isEmpty = residents.length === 0 && guests.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
-
-      {/* Header */}
       <div>
         <div className="section-heading-rule mb-2">
           <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide">The Crew</h1>
         </div>
         <p className="font-mono text-sm text-nr1-muted mt-3">
-          20+ DJs &amp; MCs · Norwich · Est. 2018
+          26 DJs &amp; MCs - Norwich - Est. 2018
         </p>
       </div>
 
@@ -53,8 +51,6 @@ export default async function DJsPage() {
         </div>
       ) : (
         <div className="space-y-16">
-
-          {/* Residents */}
           {residents.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
@@ -71,7 +67,6 @@ export default async function DJsPage() {
             </section>
           )}
 
-          {/* Guests */}
           {guests.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center gap-3">
@@ -87,10 +82,8 @@ export default async function DJsPage() {
               </div>
             </section>
           )}
-
         </div>
       )}
-
     </div>
   );
 }

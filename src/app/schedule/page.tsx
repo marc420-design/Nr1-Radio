@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { ScheduleGrid } from "@/components/schedule/ScheduleGrid";
+import { SetTimesTable } from "@/components/schedule/SetTimesTable";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import type { ScheduleRow } from "@/lib/supabase";
+import { SET_TIMES_2026, SET_TIMES_2026_TOTAL } from "@/lib/setTimes";
 
 export const metadata: Metadata = {
   title: "Schedule — NR1 DNB Radio",
@@ -54,6 +56,7 @@ export default async function SchedulePage() {
       </div>
 
       <ScheduleGrid schedule={schedule} />
+      <SetTimesTable setTimes={SET_TIMES_2026} totalRuntime={SET_TIMES_2026_TOTAL} />
     </div>
   );
 }
