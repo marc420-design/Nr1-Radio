@@ -24,12 +24,12 @@ export const SET_TIMES_2026: SetTime[] = [
   { slot: 14, start: "Sat 20:20", end: "Sat 22:46", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-07-10", duration: "2h 27m" },
   { slot: 15, start: "Sat 22:46", end: "Sun 01:49", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-07-17", duration: "3h 03m" },
   { slot: 16, start: "Sun 01:49", end: "Sun 08:41", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-07-19", duration: "6h 52m" },
-  { slot: 17, start: "Sun 08:41", end: "Sun 10:38", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-07-31 (Early)", duration: "1h 57m" },
-  { slot: 18, start: "Sun 10:38", end: "Sun 11:40", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-07-31 (Late)", duration: "1h 02m" },
+  { slot: 17, start: "Sun 08:41", end: "Sun 10:38", artist: "DJ Tuff Kuts", title: "NR1 LIVE SHOW 2026-07-31 (Early)", duration: "1h 57m" },
+  { slot: 18, start: "Sun 10:38", end: "Sun 11:40", artist: "DJ Flatt", title: "NR1 LIVE SHOW 2026-07-31 (Late)", duration: "1h 02m" },
   { slot: 19, start: "Sun 11:40", end: "Sun 13:06", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-08-07 (Early)", duration: "1h 25m" },
   { slot: 20, start: "Sun 13:06", end: "Sun 15:35", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-08-07 (Late)", duration: "2h 30m" },
   { slot: 21, start: "Sun 15:35", end: "Sun 20:02", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-08-28", duration: "4h 27m" },
-  { slot: 22, start: "Sun 20:02", end: "Sun 22:46", artist: "NR1 DNB Radio", title: "NR1 LIVE SHOW 2026-09-04", duration: "2h 44m" },
+  { slot: 22, start: "Sun 20:02", end: "Sun 22:46", artist: "DJ Tuff Kuts, Wez Walker & Skeema", title: "NR1 LIVE SHOW 2026-09-04", duration: "2h 44m" },
 ];
 
 export const SET_TIMES_2026_TOTAL = "45h 46m";
