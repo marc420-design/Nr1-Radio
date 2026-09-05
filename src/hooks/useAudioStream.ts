@@ -42,11 +42,6 @@ export function useAudioStream(): UseAudioStreamReturn {
   const [volume,      setVolumeState] = useState(0.8);
   const [status,      setStatus]      = useState<StreamStatus>("idle");
 
-  const setStatusRef    = useRef(setStatus);
-  const setIsPlayingRef = useRef(setIsPlaying);
-  setStatusRef.current    = setStatus;
-  setIsPlayingRef.current = setIsPlaying;
-
   // ── Effect 1: refresh fn-refs every render ────────────────────────────────
   // No cleanup → never tears down audio. All state is in refs so functions
   // are correct even though they're defined each render.
@@ -88,14 +83,14 @@ export function useAudioStream(): UseAudioStreamReturn {
       const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
       retryCountRef.current++;
       if (retryCountRef.current >= 4) {
-        setStatusRef.current("offline");
-        setIsPlayingRef.current(false); // show play button so user can restart
+        setStatus("offline");
+        setIsPlaying(false); // show play button so user can restart
       } else {
-        setStatusRef.current("reconnecting");
+        setStatus("reconnecting");
       }
       retryTimerRef.current = setTimeout(() => {
         if (isIntentionalPauseRef.current) return;
-        if (retryCountRef.current < 5) setStatusRef.current("reconnecting");
+        if (retryCountRef.current < 5) setStatus("reconnecting");
         hardReconnectRef.current();
       }, delay);
     }
@@ -155,14 +150,14 @@ export function useAudioStream(): UseAudioStreamReturn {
       clearWatchdog();
       clearRetryTimer(); // cancel any pending retry — we're live
       retryCountRef.current = 0;
-      setStatusRef.current("playing");
-      setIsPlayingRef.current(true);
+      setStatus("playing");
+      setIsPlaying(true);
       startBufferCheck();
     });
 
     audio.addEventListener("waiting", () => {
       if (!isIntentionalPauseRef.current) {
-        setStatusRef.current("loading");
+        setStatus("loading");
         armWatchdog();
       }
     });
@@ -187,13 +182,13 @@ export function useAudioStream(): UseAudioStreamReturn {
       // Ignore the pause event that audio.load() fires during a reconnect.
       if (isReconnectingRef.current) return;
       if (isIntentionalPauseRef.current) {
-        setStatusRef.current("idle");
-        setIsPlayingRef.current(false);
+        setStatus("idle");
+        setIsPlaying(false);
       } else {
         // Unexpected pause (OS interruption, tab suspended, network blip).
         // Arm watchdog rather than immediately reconnecting — the browser
         // often resumes on its own (e.g. iOS after a notification).
-        setStatusRef.current("loading");
+        setStatus("loading");
         armWatchdog();
       }
     });

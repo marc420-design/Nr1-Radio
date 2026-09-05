@@ -1,4 +1,4 @@
-const CACHE_NAME = "nr1-radio-v2";
+const CACHE_NAME = "nr1-radio-v3";
 const OFFLINE_URL = "/offline";
 
 // Static assets to pre-cache
@@ -34,11 +34,14 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Don't cache AzuraCast stream or API calls
+  // Don't cache AzuraCast stream or API calls — these are infinite/long-lived
+  // responses, and cache.put() on an infinite stream body never resolves,
+  // stalling the fetch for the page.
   if (
     url.hostname !== self.location.hostname ||
     url.pathname.startsWith("/api/") ||
-    url.pathname.includes("/radio/")
+    url.pathname.includes("/radio/") ||
+    url.pathname === "/stream"
   ) {
     event.respondWith(fetch(request).catch(() => new Response("", { status: 503 })));
     return;
