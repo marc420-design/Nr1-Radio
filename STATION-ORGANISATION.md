@@ -6,6 +6,8 @@ The public archive and admin list show one card per recording path while retaini
 
 Rinze, DNA and So-Low sets appear first in the featured section. Sequential date/year playlists place recordings mentioning all three first, then two, then one. Full verified lineups remain visible.
 
+J2B shows follow the first featured group, with the longest recordings first. Six recordings identify J2B in their original title or verified lineup, including memorial shows; their actual performer lineups remain visible. Radio date/year playlists retain the Rinze/DNA/So-Low priority, then put J2B recordings ahead of the remaining sets, ordered by runtime within that group. Year and weekend eligibility remain in force.
+
 Programme policy starts Saturday 10 October 2026, UK local time:
 
 - Every Saturday and Sunday: **2026 recordings**.

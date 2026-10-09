@@ -22,6 +22,10 @@ export function featuredScore(show: Pick<ShowRow, "title" | "lineup">): number {
   return [/\brinze\b/i, /\bdna\b/i, /\bso[ -]?low\b/i].filter(pattern => pattern.test(names)).length;
 }
 
+export function isJ2BShow(show: Pick<ShowRow, "title" | "lineup">): boolean {
+  return /\bj2b\b/i.test(`${show.title} ${show.lineup ?? ""}`);
+}
+
 export function getArchiveDate(show: ShowRow): { value: string; label: string } | null {
   const source = getArchiveSource(show);
   if (source?.recordedDate) return { value: source.recordedDate, label: "Recorded" };

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { ShowRow } from "@/lib/supabase";
-import { featuredScore, formatArchiveMonth, getArchiveMonth } from "@/lib/archive";
+import { featuredScore, formatArchiveMonth, getArchiveMonth, isJ2BShow } from "@/lib/archive";
 import { ShowCard } from "./ShowCard";
 
 export function ArchiveBrowser({ shows }: { shows: ShowRow[] }) {
@@ -19,7 +19,10 @@ export function ArchiveBrowser({ shows }: { shows: ShowRow[] }) {
   }), [shows, query, year, month]);
   const featured = [...filtered].filter(s => featuredScore(s) > 0).sort((a, b) => featuredScore(b) - featuredScore(a)).slice(0, 8);
   const featuredIds = new Set(featured.map(s => s.id));
-  const remaining = filtered.filter(s => !featuredIds.has(s.id));
+  const j2b = filtered.filter(s => isJ2BShow(s) && !featuredIds.has(s.id))
+    .sort((a, b) => (b.duration_min ?? 0) - (a.duration_min ?? 0));
+  const pinnedIds = new Set([...featuredIds, ...j2b.map(s => s.id)]);
+  const remaining = filtered.filter(s => !pinnedIds.has(s.id));
   const displayed = remaining.slice(0, visible);
   const groups = [...new Set(displayed.map(getArchiveMonth))];
   const inputClass = "rounded-lg border border-white/20 bg-nr1-black px-3 py-3 font-mono text-sm text-white focus:border-nr1-cyan focus:outline-none";
@@ -38,6 +41,11 @@ export function ArchiveBrowser({ shows }: { shows: ShowRow[] }) {
       </div>
       <p className="font-mono text-xs text-nr1-muted" role="status">{filtered.length} recordings · newest first</p>
       {featured.length > 0 && <section className="space-y-4" aria-label="Featured archive sets"><h2 className="font-heading text-2xl text-nr1-cyan">Rinze · DNA · So-Low</h2><p className="font-mono text-xs text-nr1-muted">Featured archive sets · full lineups shown on each recording</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">{featured.map(show => <ShowCard key={show.id} show={show} />)}</div></section>}
+      {j2b.length > 0 && <section className="space-y-4" aria-label="J2B archive shows">
+        <h2 className="font-heading text-2xl text-nr1-cyan">J2B shows</h2>
+        <p className="font-mono text-xs text-nr1-muted">Longest recordings first</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">{j2b.map(show => <ShowCard key={show.id} show={show} />)}</div>
+      </section>}
       {groups.map(group => <section key={group} aria-label={formatArchiveMonth(group)} className="space-y-4">
         <h2 className="font-heading text-2xl text-white">{formatArchiveMonth(group)}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">{displayed.filter(s => getArchiveMonth(s) === group).map(show => <ShowCard key={show.id} show={show} />)}</div>
