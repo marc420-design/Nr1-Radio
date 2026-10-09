@@ -4,20 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ShowRow } from "@/lib/supabase";
 import { bunnyThumbnailUrl, isBunnyConfigured } from "@/lib/bunny";
+import { formatArchiveDate, getArchiveDate, getArchiveSource } from "@/lib/archive";
 
 interface ShowCardProps {
   show: ShowRow;
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime()) || d.getFullYear() < 2000) return "";
-  return d.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 }
 
 function formatDuration(minutes: number | null): string {
@@ -30,13 +20,15 @@ function formatDuration(minutes: number | null): string {
 
 function resolveThumbnail(show: ShowRow): string | null {
   if (show.bunny_video_id && isBunnyConfigured()) return bunnyThumbnailUrl(show.bunny_video_id);
-  if (show.youtube_id) return `https://img.youtube.com/vi/${show.youtube_id}/mqdefault.jpg`;
+  const youtubeId = show.youtube_id || getArchiveSource(show)?.youtubeId;
+  if (youtubeId) return `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
   return null;
 }
 
 export function ShowCard({ show }: ShowCardProps) {
   const href = `/shows/${show.id}`;
   const thumbnailUrl = resolveThumbnail(show);
+  const date = getArchiveDate(show);
 
   return (
     <div className="rounded-xl border border-white/10 bg-nr1-grey/40 overflow-hidden hover:border-nr1-cyan/30 transition-colors group">
@@ -44,7 +36,7 @@ export function ShowCard({ show }: ShowCardProps) {
         <Link
           href={href}
           className="block relative aspect-video bg-nr1-black overflow-hidden"
-          aria-label={`Watch ${show.title}`}
+          aria-label={`Open ${show.title}`}
         >
           <span className="absolute inset-0 flex items-center justify-center font-heading text-4xl text-nr1-cyan/20 tracking-widest pointer-events-none">
             NR1
@@ -85,7 +77,7 @@ export function ShowCard({ show }: ShowCardProps) {
         )}
 
         <div className="flex items-center gap-3 text-xs font-mono text-nr1-muted">
-          <span>{formatDate(show.uploaded_at)}</span>
+          <span>{date ? `${date.label} ${formatArchiveDate(date.value)}` : "Date unverified"}</span>
           {show.duration_min && (
             <>
               <span>·</span>

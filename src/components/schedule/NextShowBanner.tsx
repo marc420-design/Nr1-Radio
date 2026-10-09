@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { ScheduleRow } from "@/lib/supabase";
+import { addCalendarDays, getNextScheduledShow, formatScheduleTime, londonDate, londonStart } from "@/lib/schedule";
+import { programmeYear } from "@/lib/programming";
+import programmePlan from "@/data/year-programming.json";
 
 interface NextShowBannerProps {
   schedule: ScheduleRow[];
@@ -13,57 +16,6 @@ interface NextShow {
   startsAt: Date;
 }
 
-/**
- * Finds the next upcoming show from the weekly schedule.
- * Times in the DB are stored as UK local time (Europe/London).
- * We compare against current UK time using the Intl API.
- */
-function getNextShow(schedule: ScheduleRow[]): NextShow | null {
-  if (!schedule.length) return null;
-
-  const now = new Date();
-
-  // Get current time in Europe/London
-  const londonFormatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/London",
-    hour: "numeric",
-    minute: "numeric",
-    weekday: "short",
-    hour12: false,
-  });
-  const parts = londonFormatter.formatToParts(now);
-  const londonWeekday = parts.find((p) => p.type === "weekday")?.value; // e.g. "Sat"
-  const londonHour = parseInt(parts.find((p) => p.type === "hour")?.value ?? "0", 10);
-  const londonMinute = parseInt(parts.find((p) => p.type === "minute")?.value ?? "0", 10);
-
-  const WEEKDAY_MAP: Record<string, number> = {
-    Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6,
-  };
-  const currentDayIndex = WEEKDAY_MAP[londonWeekday ?? "Mon"] ?? 0;
-  const currentMinutesInWeek = currentDayIndex * 1440 + londonHour * 60 + londonMinute;
-
-  // Convert each show to minutes-in-week
-  const showsWithMinutes = schedule.map((show) => {
-    const [h, m] = show.start_time.split(":").map(Number);
-    const minutesInWeek = show.day_of_week * 1440 + h * 60 + m;
-    return { show, minutesInWeek };
-  });
-
-  // Find the next show after now (or wrap around to next week)
-  const upcoming = showsWithMinutes
-    .filter((s) => s.minutesInWeek > currentMinutesInWeek)
-    .sort((a, b) => a.minutesInWeek - b.minutesInWeek);
-
-  const next = upcoming[0] ?? showsWithMinutes.sort((a, b) => a.minutesInWeek - b.minutesInWeek)[0];
-  if (!next) return null;
-
-  // Calculate actual Date when the show starts
-  let minutesUntil = next.minutesInWeek - currentMinutesInWeek;
-  if (minutesUntil <= 0) minutesUntil += 7 * 1440; // wrap to next week
-
-  const startsAt = new Date(now.getTime() + minutesUntil * 60 * 1000);
-  return { show: next.show, startsAt };
-}
 
 function formatCountdown(ms: number): string {
   if (ms <= 0) return "Starting now";
@@ -83,7 +35,16 @@ export function NextShowBanner({ schedule }: NextShowBannerProps) {
 
   useEffect(() => {
     function update() {
-      const show = getNextShow(schedule);
+      let show = getNextScheduledShow(schedule);
+      if (!show) {
+        const tomorrow = addCalendarDays(londonDate(), 1);
+        const date = tomorrow < programmePlan.startDate ? programmePlan.startDate : tomorrow;
+        const year = programmeYear(date);
+        if (year) show = {
+          show: { id: `archive-${date}`, show_name: year === 2026 ? "2026 Weekend" : `${year} Archive`, dj_name: null, day_of_week: (new Date(date + "T12:00:00Z").getUTCDay() + 6) % 7, start_time: "00:00:00", end_time: "23:59:00", show_type: "replay", created_at: "" },
+          startsAt: londonStart(date, "00:00:00"),
+        };
+      }
       setNextShow(show);
       if (show) {
         setCountdown(formatCountdown(show.startsAt.getTime() - Date.now()));
@@ -100,10 +61,7 @@ export function NextShowBanner({ schedule }: NextShowBannerProps) {
   const { show } = nextShow;
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const dayLabel = DAYS[show.day_of_week] ?? "";
-  const [h, m] = show.start_time.split(":").map(Number);
-  const hour = h % 12 || 12;
-  const ampm = h >= 12 ? "PM" : "AM";
-  const timeLabel = `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
+  const timeLabel = formatScheduleTime(show.start_time);
 
   return (
     <Link
@@ -113,7 +71,7 @@ export function NextShowBanner({ schedule }: NextShowBannerProps) {
       <div className="flex items-center gap-3 min-w-0">
         <div className="w-2 h-2 rounded-full bg-nr1-cyan shrink-0 animate-pulse" />
         <div className="min-w-0">
-          <p className="text-xs font-mono text-nr1-muted uppercase tracking-widest">Next show</p>
+          <p className="text-xs font-mono text-nr1-muted uppercase tracking-widest">Next programme</p>
           <p className="text-sm font-heading text-white truncate">{show.show_name}</p>
           {show.dj_name && (
             <p className="text-xs font-mono text-nr1-cyan truncate">{show.dj_name}</p>

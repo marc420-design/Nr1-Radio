@@ -6,8 +6,9 @@ interface EventCardProps {
 }
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
+  const date = new Date(dateStr.slice(0, 10) + "T12:00:00Z");
   return date.toLocaleDateString("en-GB", {
+    timeZone: "Europe/London",
     weekday: "short",
     day: "numeric",
     month: "short",

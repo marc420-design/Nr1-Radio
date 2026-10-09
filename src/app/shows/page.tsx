@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ShowCard } from "@/components/shows/ShowCard";
+import { ArchiveBrowser } from "@/components/shows/ArchiveBrowser";
+import { prepareArchive } from "@/lib/archive";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import type { ShowRow } from "@/lib/supabase";
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export default async function ShowsPage() {
   let shows: ShowRow[] = [];
@@ -22,7 +23,7 @@ export default async function ShowsPage() {
       .from("shows")
       .select("*")
       .order("uploaded_at", { ascending: false });
-    shows = (data as ShowRow[]) ?? [];
+    shows = prepareArchive((data as ShowRow[]) ?? []);
   } catch {
     // Supabase not configured yet — show empty state
   }
@@ -34,7 +35,7 @@ export default async function ShowsPage() {
           <h1 className="font-heading text-5xl sm:text-6xl text-white tracking-wide">Shows</h1>
         </div>
         <p className="font-mono text-sm text-nr1-muted mt-2">
-          Archive of sets & sessions · updated regularly
+          Sets & sessions by month · recording and publication dates labelled
         </p>
       </div>
 
@@ -74,11 +75,7 @@ export default async function ShowsPage() {
 
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {shows.map((show) => (
-            <ShowCard key={show.id} show={show} />
-          ))}
-        </div>
+        <ArchiveBrowser shows={shows} />
       )}
     </div>
   );

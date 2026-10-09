@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { EventCard } from "@/components/events/EventCard";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import type { EventRow } from "@/lib/supabase";
+import { londonDate } from "@/lib/schedule";
 
 export const metadata: Metadata = {
   title: "Events — NR1 DNB Radio",
@@ -22,7 +23,7 @@ export default async function EventsPage() {
       .from("events")
       .select("*")
       .contains("tags", ["nr1"])
-      .gte("date", new Date().toISOString().split("T")[0])
+      .gte("date", londonDate())
       .order("date");
     events = (data as EventRow[]) ?? [];
   } catch {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 import type { ShowRow } from "@/lib/supabase";
+import { formatArchiveDate, getArchiveDate, prepareArchive } from "@/lib/archive";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ async function getShows(): Promise<ShowRow[]> {
     .from("shows")
     .select("*")
     .order("uploaded_at", { ascending: false });
-  return (data as unknown as ShowRow[]) ?? [];
+  return prepareArchive((data as unknown as ShowRow[]) ?? []);
 }
 
 function sourceLabel(show: ShowRow): { label: string; className: string } {
@@ -52,7 +53,7 @@ export default async function AdminShowsPage() {
                 <th className="py-2 pr-3">Title</th>
                 <th className="py-2 pr-3">Lineup</th>
                 <th className="py-2 pr-3">Duration</th>
-                <th className="py-2 pr-3">Uploaded</th>
+                <th className="py-2 pr-3">Date</th>
                 <th className="py-2 pr-3"></th>
               </tr>
             </thead>
@@ -70,7 +71,7 @@ export default async function AdminShowsPage() {
                       {show.duration_min != null ? `${show.duration_min}m` : "—"}
                     </td>
                     <td className="py-2 pr-3 font-mono text-nr1-muted">
-                      {show.uploaded_at ? show.uploaded_at.slice(0, 10) : "—"}
+                      {getArchiveDate(show) ? `${getArchiveDate(show)!.label} ${formatArchiveDate(getArchiveDate(show)!.value)}` : "Date unverified"}
                     </td>
                     <td className="py-2 pr-3 space-x-3">
                       <Link href={`/shows/${show.id}`} className="text-nr1-cyan hover:underline text-xs">

@@ -22,6 +22,7 @@ const fs = require("fs");
 const path = require("path");
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const archiveCatalog = require("../src/data/archive-catalog.json");
 
 function readEnv(name) {
   for (const file of [".env.local", ".env.vercel"]) {
@@ -54,11 +55,11 @@ async function fetchAzuraFiles() {
   const res = await fetch(url, { headers: { "X-API-Key": AZURA_KEY } });
   if (!res.ok) fatal(`AzuraCast files/list HTTP ${res.status}`);
   const data = await res.json();
-  return Array.isArray(data) ? data : [];
+  return Array.isArray(data) ? data.map(row => row.media || row).filter(row => row.id && row.path) : [];
 }
 
 async function fetchExistingShows() {
-  const url = `${SUPABASE_URL}/rest/v1/shows?select=id,azuracast_id,tracklist_status`;
+  const url = `${SUPABASE_URL}/rest/v1/shows?select=*`;
   const res = await fetch(url, {
     headers: {
       apikey: SUPABASE_SERVICE_KEY,
@@ -70,7 +71,7 @@ async function fetchExistingShows() {
 }
 
 async function upsertShow(row) {
-  const url = `${SUPABASE_URL}/rest/v1/shows?on_conflict=azuracast_id`;
+  const url = `${SUPABASE_URL}/rest/v1/shows?on_conflict=id`;
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -93,21 +94,19 @@ function slugFromPath(azuracastPath) {
   return base.replace(/\.[^.]+$/, "");
 }
 
-function toShowRow(file, existingByAzuraId) {
-  const existing = existingByAzuraId.get(file.id);
+function toShowRow(file, existingByPath) {
+  const existing = existingByPath.get(file.path.toLowerCase());
+  const source = archiveCatalog[file.path.toLowerCase()];
   return {
+    ...(existing ? { id: existing.id } : {}),
     azuracast_id: file.id,
     azuracast_path: file.path,
-    // youtube_id is unique+not-null in schema. We don't have real YT IDs for
-    // most files, so we synthesize a placeholder from the AzuraCast path.
-    // If an existing row already has a proper YT id, keep it (merge-duplicates
-    // only touches supplied columns, but this is fine because we always send
-    // the same placeholder for the same file).
-    youtube_id: existing ? undefined : `azuracast:${file.id}`,
-    title: file.title || slugFromPath(file.path),
-    lineup: file.artist || null,
+    ...(existing ? {} : { youtube_id: null }),
+    title: source?.title || file.title || slugFromPath(file.path),
+    lineup: source ? source.lineup : (file.artist || null),
     duration_min: file.length ? Math.round((file.length / 60) * 10) / 10 : null,
-    uploaded_at: file.uploaded_at ? new Date(file.uploaded_at * 1000).toISOString() : new Date().toISOString(),
+    // File imports are not recording/publication dates. Keep unknown dates unknown.
+    uploaded_at: source ? source.publishedAt : (existing?.uploaded_at ?? null),
     // Only set tracklist_status on new rows; never overwrite an existing status
     ...(existing ? {} : { tracklist_status: "missing" }),
   };
@@ -120,8 +119,14 @@ async function main() {
 
   console.log(`Fetching existing Supabase 'shows' rows ...`);
   const existing = await fetchExistingShows();
-  const byAzuraId = new Map(existing.filter(s => s.azuracast_id != null).map(s => [s.azuracast_id, s]));
-  console.log(`  ${existing.length} existing rows (${byAzuraId.size} matched by azuracast_id)`);
+  const byPath = new Map();
+  for (const row of existing) {
+    if (!row.azuracast_path) continue;
+    const key = row.azuracast_path.toLowerCase();
+    const previous = byPath.get(key);
+    if (!previous || row.tracklist?.length || row.bunny_video_id) byPath.set(key, row);
+  }
+  console.log(`  ${existing.length} existing rows (${byPath.size} recording paths)`);
 
   let inserted = 0;
   let updated = 0;
@@ -130,16 +135,16 @@ async function main() {
 
   for (const file of files) {
     if (!file.id || !file.path) { skipped++; continue; }
-    const row = toShowRow(file, byAzuraId);
+    const row = toShowRow(file, byPath);
     if (DRY_RUN) {
-      const kind = byAzuraId.has(file.id) ? "UPDATE" : "INSERT";
+      const kind = byPath.has(file.path.toLowerCase()) ? "UPDATE" : "INSERT";
       console.log(`  [dry-run] ${kind} ${file.path} (azuracast_id=${file.id})`);
-      byAzuraId.has(file.id) ? updated++ : inserted++;
+      byPath.has(file.path.toLowerCase()) ? updated++ : inserted++;
       continue;
     }
     try {
       await upsertShow(row);
-      byAzuraId.has(file.id) ? updated++ : inserted++;
+      byPath.has(file.path.toLowerCase()) ? updated++ : inserted++;
     } catch (e) {
       failed++;
       console.error(`  ✗ ${file.path}:`, e.message);

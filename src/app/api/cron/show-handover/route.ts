@@ -41,6 +41,10 @@ export async function GET(request: Request) {
   if (!npRes.ok) return NextResponse.json({ error: "nowplaying fetch failed" }, { status: 502 });
   const np = await npRes.json();
 
+  if (np.live?.is_live) {
+    return NextResponse.json({ status: "live_broadcast_active" });
+  }
+
   const currentPlaylist: string = np.now_playing?.playlist ?? "";
   const elapsed: number = np.now_playing?.elapsed ?? 0;
 

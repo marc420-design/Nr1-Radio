@@ -5,20 +5,18 @@ import { getSupabaseServerClient } from "@/lib/supabase";
 import type { ShowRow } from "@/lib/supabase";
 import { BunnyVideoPlayer } from "@/components/shows/BunnyVideoPlayer";
 import { bunnyThumbnailUrl, isBunnyConfigured } from "@/lib/bunny";
+import { formatArchiveDate, getArchiveDate, getArchiveSource } from "@/lib/archive";
+import { ArchiveAudioPlayer } from "@/components/shows/ArchiveAudioPlayer";
 
 export const revalidate = 3600;
 
 async function getShow(id: string): Promise<ShowRow | null> {
   const supabase = getSupabaseServerClient();
   const { data } = await supabase.from("shows").select("*").eq("id", id).maybeSingle();
-  return (data as unknown as ShowRow) ?? null;
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime()) || d.getFullYear() < 2000) return "";
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  if (!data) return null;
+  const show = data as unknown as ShowRow;
+  const source = getArchiveSource(show);
+  return source ? { ...show, title: source.title, lineup: source.lineup } : show;
 }
 
 function formatDuration(minutes: number | null): string {
@@ -87,6 +85,8 @@ export default async function ShowDetailPage({
 
   const hasBunny = !!show.bunny_video_id && isBunnyConfigured();
   const hasYouTube = !!show.youtube_id;
+  const archiveDate = getArchiveDate(show);
+  const audioUrl = getArchiveSource(show)?.audioUrl;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -105,7 +105,7 @@ export default async function ShowDetailPage({
           <p className="font-mono text-sm text-nr1-cyan mt-2">{show.lineup}</p>
         )}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-nr1-muted mt-3">
-          {show.uploaded_at && <span>{formatDate(show.uploaded_at)}</span>}
+          <span>{archiveDate ? `${archiveDate.label} ${formatArchiveDate(archiveDate.value, true)}` : "Date unverified"}</span>
           {show.duration_min && (
             <>
               <span>·</span>
@@ -117,6 +117,8 @@ export default async function ShowDetailPage({
 
       {hasBunny ? (
         <BunnyVideoPlayer videoId={show.bunny_video_id!} title={show.title} />
+      ) : audioUrl ? (
+        <ArchiveAudioPlayer url={audioUrl} title={show.title} />
       ) : hasYouTube ? (
         <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-nr1-black">
           <iframe

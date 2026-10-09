@@ -1,0 +1,17 @@
+{
+  "startDate": "2026-10-10",
+  "weekdayStart": "2026-10-12",
+  "endDate": "2027-10-10",
+  "weekdayYears": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "weekendYear": 2026,
+  "timezone": "Europe/London"
+}
