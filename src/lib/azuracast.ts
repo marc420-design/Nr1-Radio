@@ -126,15 +126,6 @@ export function getStreamUrl(): string {
   return STREAM_URL;
 }
 
-export function createSSEConnection(shortcode: string): EventSource | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return new EventSource(`/api/sse?shortcode=${encodeURIComponent(shortcode)}`);
-  } catch {
-    return null;
-  }
-}
-
 export const STATION_SHORTCODE_VALUE = STATION_SHORTCODE;
 
 // Strip AzuraCast internal IDs and station tags from song titles

@@ -47,8 +47,6 @@ function parseNowPlaying(data: NowPlayingData): NowPlayingState {
 
 export function useNowPlaying(): NowPlayingState {
   const [state, setState] = useState<NowPlayingState>(DEFAULT_STATE);
-  const sseRef = useRef<EventSource | null>(null);
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const poll = useCallback(async () => {
     try {
@@ -62,48 +60,17 @@ export function useNowPlaying(): NowPlayingState {
     }
   }, []);
 
-  const startPolling = useCallback(() => {
-    if (pollIntervalRef.current) return;
-    poll(); // immediate
-    pollIntervalRef.current = setInterval(poll, 15_000);
-  }, [poll]);
-
-  const stopPolling = useCallback(() => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
-    }
-  }, []);
-
+  // Poll from mount. This replaced an SSE feed (/api/sse) that only ever carried
+  // Centrifugo keepalives, never track data: the upstream subscription parameter
+  // was malformed, and the interval was started from that feed's error handler,
+  // so now-playing stayed frozen until the connection dropped at 300s.
   useEffect(() => {
-    // Try SSE via proxy (avoids mixed-content blocking)
-    const sse = new EventSource("/api/sse");
-    sseRef.current = sse;
-
-    sse.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data) as NowPlayingData;
-        setState(parseNowPlaying(data));
-        // SSE working — stop polling if it was running
-        stopPolling();
-      } catch {
-        // Malformed SSE message
-      }
-    };
-
-    sse.onerror = () => {
-      startPolling(); // startPolling() already guards against double-start
-    };
-
-    // Do an immediate poll so we have data before SSE kicks in
     poll();
-
+    const id = setInterval(poll, 15_000);
     return () => {
-      sse.close();
-      sseRef.current = null;
-      stopPolling();
+      clearInterval(id);
     };
-  }, [poll, startPolling, stopPolling]);
+  }, [poll]);
 
   return state;
 }
