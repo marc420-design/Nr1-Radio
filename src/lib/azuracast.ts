@@ -1,4 +1,4 @@
-import { AZURACAST_BASE_URL as BASE_URL, STATION_ID, STATION_SHORTCODE } from "./constants";
+import { AZURACAST_BASE_URL as BASE_URL, STATION_ID, STATION_SHORTCODE, STREAM_URL } from "./constants";
 
 export interface NowPlayingData {
   station: {
@@ -120,10 +120,10 @@ export async function getSchedule(): Promise<ScheduleEntry[]> {
 }
 
 export function getStreamUrl(): string {
-  // Direct URL — bypasses the /api/stream Edge proxy which has a
-  // ~5-6 minute Vercel streaming timeout that was cutting the stream.
-  // AzuraCast serves on HTTPS so no mixed-content issues.
-  return `${BASE_URL}/listen/${STATION_SHORTCODE}/radio.mp3`;
+  // CDN edge when one is configured, else the origin direct — which bypasses
+  // the /api/stream Edge proxy that has a ~5-6 minute Vercel streaming timeout
+  // that was cutting the stream. Both serve HTTPS, so no mixed-content issues.
+  return STREAM_URL;
 }
 
 export function createSSEConnection(shortcode: string): EventSource | null {
