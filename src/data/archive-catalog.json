@@ -2848,5 +2848,15 @@
     "lineup": "J2B, MC GHOST, MC SICKA, JOHNY SLIPZ, RINZE, PULSE",
     "dateKind": "published",
     "audioUrl": "https://radio.listen-nr1dnb.com/api/station/1/ondemand/download/08d2dd91a5ae2726931d9884"
+  },
+  "nr1_live_show_2026_10_23_wez_walker_tuff_kuts_odah_d97.mp3": {
+    "mediaId": 501,
+    "recordedDate": "2026-10-23",
+    "publishedAt": null,
+    "youtubeId": null,
+    "title": "NR1 LIVE SHOW 2026-10-23",
+    "lineup": "WEZ WALKER, TUFF KUTS, ODAH, D97",
+    "dateKind": "recorded",
+    "audioUrl": "https://radio.listen-nr1dnb.com/api/station/1/ondemand/download/4230ccbe627306c2fc80d3c9"
   }
 }
