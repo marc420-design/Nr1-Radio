@@ -38,7 +38,12 @@ export const dynamic = "force-dynamic";
 const STREAM_URL = "https://radio.listen-nr1dnb.com/listen/nr1_dnb_radio/radio.mp3";
 const STATION_NAME = "NR1 Drum and Bass Radio";
 const STATION_SUBTITLE = "Norwich, UK";
-const STATION_IMAGE = "https://listen-nr1dnb.com/icons/icon-512.png";
+/**
+ * Versioned filenames: Alexa caches artwork by URL, so replacing the file in
+ * place leaves devices showing the old image. Bump the suffix when the art changes.
+ */
+const STATION_IMAGE = "https://listen-nr1dnb.com/icons/icon-512-v2.png";
+const STATION_BACKGROUND = "https://listen-nr1dnb.com/alexa-background-v2.png";
 const STREAM_TOKEN = "nr1-radio-stream";
 
 /** Skill id, so another skill cannot point itself at this endpoint. */
@@ -48,7 +53,7 @@ const STREAM_METADATA = {
   title: STATION_NAME,
   subtitle: STATION_SUBTITLE,
   art: { sources: [{ url: STATION_IMAGE }] },
-  backgroundImage: { sources: [{ url: STATION_IMAGE }] },
+  backgroundImage: { sources: [{ url: STATION_BACKGROUND }] },
 };
 
 /** Start (or restart) the stream. Token varies for retries so Alexa treats it as new. */
