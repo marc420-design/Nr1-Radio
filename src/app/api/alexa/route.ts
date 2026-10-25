@@ -46,8 +46,11 @@ const STATION_IMAGE = "https://listen-nr1dnb.com/icons/icon-512-v2.png";
 const STATION_BACKGROUND = "https://listen-nr1dnb.com/alexa-background-v2.png";
 const STREAM_TOKEN = "nr1-radio-stream";
 
-/** Skill id, so another skill cannot point itself at this endpoint. */
-const SKILL_ID = process.env.ALEXA_SKILL_ID ?? "";
+/** Keep the published skill working while NR1 Family is tested and certified. */
+const SKILL_IDS = new Set([
+  process.env.ALEXA_SKILL_ID || "amzn1.ask.skill.97e23285-61d2-4aad-87e0-b943035c5472",
+  "amzn1.ask.skill.e0dcb259-d5eb-41af-8fb3-9518f00e1b67",
+]);
 
 const STREAM_METADATA = {
   title: STATION_NAME,
@@ -259,12 +262,12 @@ export async function POST(request: Request) {
   }
 
   // Confirm the request is aimed at this skill and not another one pointed here.
-  if (SKILL_ID) {
+  {
     const applicationId =
       envelope?.context?.System?.application?.applicationId ??
       envelope?.session?.application?.applicationId;
 
-    if (applicationId !== SKILL_ID) {
+    if (!SKILL_IDS.has(applicationId)) {
       console.warn(`Rejected Alexa request for unexpected skill id: ${applicationId}`);
       return new Response("Unexpected application id", { status: 400 });
     }
