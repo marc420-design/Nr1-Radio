@@ -75,6 +75,30 @@ registers `reset-chat` and `archive-history`, both daily.
   rows only exist **from 2026-10-24**; earlier dates are 0 and never backfilled.
 - Webhook `NR1 live push alerts` configured, both triggers, request timeout 15s.
 
+### Audio processing enabled 2026-10-26 (~21:25)
+
+The station ran `audio_processing_method: "none"` — no limiter, no loudness
+normalisation. Confirmed from the pre-update backup that this was **not** caused
+by the update; it had always been off. Combined with an archive of YouTube rips
+(filenames carry the video id, e.g. `nr1_show_[0shvxdeyqb8]_nr1.mp3`), that meant
+clipped/hot sets went out overdriven and quiet ones stayed quiet.
+
+Now: **Master_me, `music_general`, loudness target −14 LUFS** (the pre-existing
+−16 was a podcast target). Confirmed audibly improved.
+
+ReplayGain left **off** on purpose — enabling it re-analyses the whole media
+library, and Master_me handles loudness at the stream level.
+
+**A soft reload is not enough for this setting.** Reload only re-reads Icecast;
+Master_me changes the Liquidsoap chain, so it needs **Restart Broadcasting**
+(~30s outage). The pending-changes banner staying up after a reload is the tell.
+
+Still unaddressed: `shows.lufs` and `shows.clipping_status` are **NULL for every
+row**. Those columns exist to flag damaged files but have never been populated,
+so there is no way to know which archive sets are clipped short of playing them.
+Processing cannot un-clip audio already distorted inside a file — those need
+re-sourcing from the original recordings rather than YouTube.
+
 ### Known AzuraCast bug (pre-update)
 Saving a webhook threw `StationWebhook::$station_id must not be accessed before
 initialization` — it saved anyway, the list just didn't refresh. Unverified
