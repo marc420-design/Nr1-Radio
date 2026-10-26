@@ -8,13 +8,26 @@ import { StickyPlayer } from "@/components/player/StickyPlayer";
 import { PwaInstallBanner } from "@/components/ui/PwaInstallBanner";
 import { SOCIAL_LINKS } from "@/lib/constants";
 
+// Only directories where the station is actually listed, linked to its own page
+// rather than a search. Verified 2026-10-26; re-check if a listing is removed.
+//
+// Deliberately absent:
+//   TuneIn         - not listed. The Broadcaster Portal submission never resulted
+//                    in an entry (a search of their API returns no matches), so a
+//                    link would land on an empty result page. Add back once live.
+//   internet-radio - no station entry there either; the old link went to their
+//                    homepage, implying a listing that does not exist.
+//   Radio Browser  - an aggregator database rather than a place to listen, and it
+//                    currently holds a duplicate entry whose homepage and favicon
+//                    point at the dead listen.nr1dnb.com host.
+//
+// myTuner and OnlineRadioBox both ask for a reciprocal link in their approval
+// emails, which this row provides.
 const DIRECTORY_LINKS = [
-  { label: "TuneIn",          href: "https://tunein.com/search/?query=NR1+DNB+Radio" },
-  { label: "radio.net",       href: "https://www.radio.net/search/nr1+dnb" },
-  { label: "MyTuner",         href: "https://mytuner-radio.com/radio/nr1-dnb-radio-518564/" },
+  { label: "radio.net",       href: "https://www.radio.net/s/nr1dnbradio" },
   { label: "OnlineRadioBox",  href: "https://onlineradiobox.com/uk/nr1dnb/" },
-  { label: "Radio Browser",   href: "https://www.radio-browser.info/search?name=NR1+Drum+and+Bass" },
-  { label: "InternetRadio",   href: "https://www.internet-radio.com" },
+  { label: "myTuner",         href: "https://mytuner-radio.com/radio/nr1-dnb-radio-518564/" },
+  { label: "Streema",         href: "https://streema.com/radios/NR1_DNB_Radio" },
 ] as const;
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
