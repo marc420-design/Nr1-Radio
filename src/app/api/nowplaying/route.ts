@@ -13,7 +13,14 @@ export async function GET() {
       return NextResponse.json({ error: "upstream error" }, { status: res.status });
     }
     const data = await res.json();
-    return NextResponse.json(data);
+    // Share this public station snapshot across visitors without caching errors
+    // or serving stale LIVE status during an upstream outage.
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=5",
+      },
+    });
   } catch {
     return NextResponse.json({ error: "unreachable" }, { status: 503 });
   }

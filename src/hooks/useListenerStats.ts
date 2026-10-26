@@ -33,8 +33,9 @@ export function useListenerStats(refreshMs: number = 60000): ListenerStats {
     let cancelled = false;
 
     async function load() {
+      if (document.visibilityState === "hidden") return;
       try {
-        const res = await fetch("/api/listener-stats", { cache: "no-store" });
+        const res = await fetch("/api/listener-stats");
         if (!res.ok) return;
         const data = (await res.json()) as ListenerStats;
         if (!cancelled) setStats(data);
@@ -45,9 +46,14 @@ export function useListenerStats(refreshMs: number = 60000): ListenerStats {
 
     load();
     const id = setInterval(load, refreshMs);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void load();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
       clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [refreshMs]);
 

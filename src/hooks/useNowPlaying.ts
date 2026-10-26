@@ -56,14 +56,17 @@ function parseNowPlaying(data: NowPlayingData): NowPlayingState {
   };
 }
 
-export function useNowPlaying(): NowPlayingState {
+export function useNowPlaying(isPlaying = false): NowPlayingState {
   const [state, setState] = useState<NowPlayingState>(DEFAULT_STATE);
   const lastSuccessRef = useRef(0);
 
   const poll = useCallback(async () => {
+    // Keep lock-screen metadata fresh during background playback, but avoid
+    // invoking the API for an idle tab nobody is looking at.
+    if (document.visibilityState === "hidden" && !isPlaying) return;
     try {
       // Use the server-side proxy to avoid mixed-content blocking
-      const res = await fetch("/api/nowplaying", { cache: "no-store" });
+      const res = await fetch("/api/nowplaying");
       if (!res.ok) throw new Error(`nowplaying ${res.status}`);
       const data = (await res.json()) as NowPlayingData | { error: string };
       // The proxy reports upstream trouble as an { error } body; that is a failed
@@ -83,17 +86,24 @@ export function useNowPlaying(): NowPlayingState {
         return prev.isStale ? prev : { ...prev, isStale: true };
       });
     }
-  }, []);
+  }, [isPlaying]);
 
   // Poll from mount. This replaced an SSE feed (/api/sse) that only ever carried
   // Centrifugo keepalives, never track data: the upstream subscription parameter
   // was malformed, and the interval was started from that feed's error handler,
   // so now-playing stayed frozen until the connection dropped at 300s.
   useEffect(() => {
-    poll();
+    // Schedule the first poll rather than setting state from the effect body.
+    const initialPoll = setTimeout(poll, 0);
     const id = setInterval(poll, POLL_INTERVAL_MS);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void poll();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
+      clearTimeout(initialPoll);
       clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [poll]);
 
