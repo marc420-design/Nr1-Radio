@@ -20,13 +20,18 @@ import { SOCIAL_LINKS } from "@/lib/constants";
 //   Radio Browser  - an aggregator database rather than a place to listen, and it
 //                    currently holds a duplicate entry whose homepage and favicon
 //                    point at the dead listen.nr1dnb.com host.
+//   myTuner        - TEMPORARILY REMOVED. The listing (id 518564) publishes the
+//                    owner's full home address in its Address field, and linking
+//                    to it drives traffic there. Restore this entry once myTuner
+//                    have removed it (help@mytuner.mobi); they ask for a
+//                    reciprocal link in their approval email, so it should go
+//                    back when it is safe to do so.
 //
-// myTuner and OnlineRadioBox both ask for a reciprocal link in their approval
-// emails, which this row provides.
+// OnlineRadioBox asks for a reciprocal link in its approval email, which this
+// row provides.
 const DIRECTORY_LINKS = [
   { label: "radio.net",       href: "https://www.radio.net/s/nr1dnbradio" },
   { label: "OnlineRadioBox",  href: "https://onlineradiobox.com/uk/nr1dnb/" },
-  { label: "myTuner",         href: "https://mytuner-radio.com/radio/nr1-dnb-radio-518564/" },
   { label: "Streema",         href: "https://streema.com/radios/NR1_DNB_Radio" },
 ] as const;
 

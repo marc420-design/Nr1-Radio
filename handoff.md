@@ -1,219 +1,138 @@
-# NR1 Radio — Session Handoff (2026-07-05)
+# NR1 Radio — Session Handoff (2026-10-26)
+
+> Supersedes the 2026-07-05 handoff. The old "discoverability rollout is PAUSED
+> until PRS + PPL are in place" instruction **no longer reflects reality** — see
+> *Licensing* below. Directory listings were claimed on 24–26 Oct.
+
+## ⚠️ Act on this first — home address published
+
+The **myTuner listing (id 518564) still publicly shows the owner's full home
+address** in its Address field. This was first noted in the July handoff and is
+**still live** as of 2026-10-26. (The address itself is deliberately not repeated
+here — this file is in a GitHub repo.)
+
+The site footer now links to that listing, so the site is driving traffic to it.
+
+- Fix: email **help@mytuner.mobi** asking for the address to be removed from the
+  public listing, or edit it through the broadcaster edit form.
+- Consider pulling the myTuner link from `DIRECTORY_LINKS` in
+  `src/components/ui/SiteChrome.tsx` until it is removed.
+- Worth auditing the other four directories for the same field.
 
 ## What shipped this session
 
-Commits pushed to `main` (in order):
+Commits on `main`:
 
-1. **`2b9a442`** — Align README + PWA manifest with canonical directory metadata.
-   - `README.md`: fix "30+ DJs" → "20+ DJs & MCs" (only stale surface — the rest of the codebase already used 20+).
-   - `public/manifest.json`: "Norwich's finest" → "Norwich's underground" so PWA install prompt matches the site's own positioning.
-2. **`680ccda`** — Align remaining page metadata to canonical "underground" copy.
-   - `/listen` and `/shows` page meta descriptions still said "Norwich's finest" — swapped to "underground". Every page-level SEO description, PWA manifest, and `station.ts` now agree.
+1. **`0f16645`** — `scripts/listener-hours.mjs`. Computes PRS-licensable listener
+   hours from AzuraCast, excluding the AzuraCast host's own IP, directory bots,
+   and radio-app relay traffic. See *Licensing*.
+2. **`858cc80`** — LIVE badge no longer outlives the broadcast. `useNowPlaying`
+   used to swallow failed polls and keep the last state forever, so an
+   unreachable API froze a "Live" badge on screen indefinitely. Now tracks the
+   last successful poll, marks state stale after 3 missed intervals (45s), and
+   `LiveBadge` renders a neutral unknown state rather than a false Live/Offline.
+3. **`d1ab415`** — Web push for live-show alerts (see *Push notifications*).
+4. **`64effa5`** — `NotifyButton` placed in `PlayerBar`, hidden while already live.
+5. **`73583b6`** — Footer directory links corrected (see *Directories*).
 
-Live-site verified after each push (`curl <url> | grep 'meta name="description"'`).
+Merged in parallel by another agent: **`8cbd5f6`** "Reduce radio polling compute
+with short shared caching (#2)" — visibility-aware polling, server-side caching,
+and the first real test coverage (suite now 14 tests / 3 files). It touched
+`useNowPlaying.ts` and `PlayerContext.tsx` but **preserved the staleness fix**.
 
-### Built locally (not yet committed) — video player for one-hour DnB sets
+## Push notifications (new)
 
-Full feature: video player for uploading one-hour special sets on a takedown-resistant host (**Bunny.net Stream** — YouTube's Content ID has been taking NR1's sets down). Paste-URL-in-admin flow, dedicated `/shows/[id]` detail pages.
+Live-show alerts, driven by AzuraCast's `live_connect` webhook — **not** a cron.
+`show-handover`'s "runs every minute" comment was never true; `vercel.json` only
+registers `reset-chat` and `archive-history`, both daily.
 
-**Files added (new):**
-```
-src/lib/bunny.ts                              (URL helpers + GUID parser)
-src/components/shows/BunnyVideoPlayer.tsx     (responsive iframe wrapper)
-src/app/shows/[id]/page.tsx                   (server-rendered detail page with OG, tracklist)
-src/app/shows/[id]/not-found.tsx              (404 fallback)
-src/app/admin/shows/page.tsx                  (admin list with source badges)
-src/app/admin/shows/new/page.tsx              (paste-URL form)
-src/app/admin/shows/new/actions.ts            (createShowAction server action)
-supabase-migration-video.sql                  (Bunny columns migration)
-```
+- `POST /api/webhooks/azuracast/live` — **does not trust the request**. AzuraCast's
+  connector has no confirmed custom-header support, and the usual workaround puts
+  a secret in a query string. So the route ignores the body entirely and re-reads
+  live state from AzuraCast's API with `AZURACAST_API_KEY`. An unauthenticated
+  call achieves nothing but one upstream fetch.
+- Idempotency: `live.broadcast_start` is the primary key of `push_broadcasts`,
+  claimed *before* sending. Duplicate deliveries conflict and send nothing.
+- `push_subscriptions` + `push_broadcasts` have **RLS on with no policies** — the
+  anon key cannot read or write them. The browser subscribes via
+  `/api/push/subscribe`, which uses the service-role client.
+- Env: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` in
+  `.env.local` and Vercel Production. Optional `PUSH_WEBHOOK_SECRET`.
 
-**Files modified:**
-```
-supabase-schema.sql                           (Bunny columns + youtube_id nullable)
-src/lib/supabase.ts                           (ShowRow type — bunny_video_id, description, youtube_id nullable)
-src/components/shows/ShowCard.tsx             (links to internal /shows/[id], prefers Bunny thumbnail)
-src/app/admin/layout.tsx                      (SHOWS nav entry added)
-.env.local                                    (Bunny env vars — see below)
-```
+**Untested path:** no notification has ever been delivered to a device. The
+`not_live` branch is proven (webhook TEST returns `{"status":"not_live"}`); the
+`is_live` branch is not. First real test is a Friday DJ connection.
 
-**Environment work (done — no code needed):**
-- Bunny.net account created + email verified.
-- Stream Library **NR1 DNB Shows** created — **Library ID `697346`**, **CDN hostname `vz-d1e185a9-bda.b-cdn.net`**.
-- Delivery tier: **High Volume** ($5/TB, ideal for hour-long video).
-- `$20` trial credit + 14-day trial active.
-- **`NEXT_PUBLIC_BUNNY_STREAM_LIBRARY_ID`** + **`NEXT_PUBLIC_BUNNY_STREAM_CDN_HOSTNAME`** set in both `.env.local` and Vercel Production.
+## AzuraCast (updated tonight)
 
-**Supabase migration applied** (SQL run via dashboard):
-- `youtube_id` → nullable
-- `bunny_video_id text` added, indexed
-- `description text` added
-- Column comments set
-- **Important finding:** `shows` table has **246 rows** from AzuraCast seed (used by tracklists / PRS-PPL reports, no video source). Original plan had a check constraint requiring `youtube_id OR bunny_video_id` — dropped it, would have broken those rows. Validation happens in `createShowAction` for user-created rows instead.
+- Updated from `#421e9d2` (2026-05-07) to **`#aafac69` (2026-10-26)** — 5½ months.
+  ~2-minute outage, 19:05–19:07. Still on **Rolling Release**.
+- **Backups were disabled with zero backups existing.** Now: nightly 04:00 UTC,
+  media excluded, 14 copies, plus a verified off-box copy at
+  `~/Downloads/manual_backup_20261026_1901.zip` (zip integrity OK, contains
+  `db.sql` 1.96 MB).
+- Analytics `no_ip` → `all` on 24 Oct fixed a stalled aggregation. Per-listener
+  rows only exist **from 2026-10-24**; earlier dates are 0 and never backfilled.
+- Webhook `NR1 live push alerts` configured, both triggers, request timeout 15s.
 
-### Directory-discoverability audit (paused)
+### Known AzuraCast bug (pre-update)
+Saving a webhook threw `StationWebhook::$station_id must not be accessed before
+initialization` — it saved anyway, the list just didn't refresh. Unverified
+whether the new build fixes it.
 
-Full audit + two-week rollout plan drafted at `~/.claude/plans/nr1-dnb-discoverability-zazzy-planet.md`. Started the myTuner claim in-browser (confirmed listing id `518564` publicly exposes home address `61 Lionwood Road, Norwich, NR1 4PT`). **All directory claim/edit work paused** until PRS WMLO + PPL webcaster licences are in place — user's call, sensible.
+## Licensing
 
----
+- **PRS replied 26 Oct** (Daniel Priestley, Sales Advisor – Radio). It is an
+  **Internet Radio Licence**, not the LOML. Likely the **minimum fee: £199 + VAT/yr**,
+  covering up to **800 average monthly listener hours**.
+- PRS only licenses the UK + managed territories (Crown Dependencies, BOTs,
+  Cyprus, Bahamas, Malta). Submit **UK hours only** and tick "Inside the UK" only.
+  Non-UK listeners need foreign societies or a geo-block — **unresolved decision**.
+- **PPL** (Linear Webcast Licence) — enquiry 24 Oct, chaser 26 Oct, no reply and
+  no auto-ack. Next step: their website form.
+- Measured 25–26 Oct: **13.37 licensable hours over 2.04 days ≈ 199/month**, ~4×
+  inside the allowance. Pull real 30-day figures ~24 Nov with
+  `AZURACAST_API_KEY=... node scripts/listener-hours.mjs --days 30 --breakdown`.
+- **Do not submit raw AzuraCast numbers.** The daily figure is unique-listeners-
+  per-day, not concurrent, and is dominated by bots: of 199 connected hours over
+  25–26 Oct, 186 were the host's own IP, directory probes, or app relays.
+  Tonight's restart also distorts 26 Oct.
 
-## What's left immediately
+## Directories
 
-1. **Commit + push the video-player code** — 8 new files + 5 modified. Not yet on `main`.
-2. **Upload one test video to Bunny Stream** via `dash.bunny.net/stream/697346`. Copy the video GUID.
-3. **Smoke-test end-to-end**: `/admin/shows/new` → paste GUID → submit → `/shows/[id]` should load with player + OG meta.
-4. **Verify Vercel Production deploy** picks up both the code and the new env vars — the `NEXT_PUBLIC_*` names mean they need to be present at build time.
+Verified live and pulling the stream (crawlers seen in the listener log):
+`radio.net`, `OnlineRadioBox` (`ORB HisBot`), `Streema` (`SimpleRadioFree`),
+`myTuner` (`myTuner`).
 
-## Discoverability rollout — waiting on licences
+Footer `DIRECTORY_LINKS` corrected — radio.net search URL was a **404**, TuneIn and
+internet-radio pointed at listings that **don't exist**, Streema was missing.
 
-Do **not** proactively claim/edit any directory listings (myTuner, TuneIn, radio.net, Streema/Simple Radio, Online Radio Box, Radio UK, LiveRadioUK, Radio Garden, Radio Browser, Internet-Radio.com) until user confirms PRS WMLO + PPL webcaster licences are in place. Directory reviewers don't check licensing, but user does not want to raise NR1's profile until legally clean.
+- **TuneIn: not listed.** A TuneIn API search returns zero matches despite
+  Broadcaster Portal OTP logins on 24 Oct. Highest-value gap (Alexa, Sonos, cars).
+- **Radio Browser: duplicate entry.** Keep `934abfbf-3482-4460-aa6d-af95247bdb5a`;
+  `52243a80-7713-4392-89c0-f3bde610993b` has a dead homepage and favicon on
+  `listen.nr1dnb.com` (missing hyphen) and holds more votes (35 vs 30). There is
+  **no edit/delete API** — only `/json/add` and `/json/vote`. Identical removal
+  requests on their GitLab (#38, #39) have sat unanswered for two months, so
+  voting the correct entry up is the only practical lever.
 
-Priority when unblocked: **strip the public street address from myTuner listing 518564 first**.
+## What's left
 
----
+1. **Visa-5019 is dead** — Google Play: Suno £9.49 **due 31 Oct**, Kimi £17.49
+   overdue, plus £42.97 of YouTube/Google One renewals 19–22 Nov on the same card.
+   Mixcloud was already fixed.
+2. **myTuner home address** — see top.
+3. **TuneIn listing.**
+4. **Friday** — first real `live_connect` push test.
+5. **PRS application ~24 Nov** + the territory decision.
+6. **Branch protection on `main`** — two agents pushed to production today.
 
-## Prior session
+## Gotchas
 
-# NR1 Radio — Session Handoff (2026-07-04, PM)
-
-### What shipped that session
-
-Commits pushed to `main` (in order):
-
-1. **`8dca599`** — GitHub Actions workflow to trigger Vercel deploys on push (fallback for broken Vercel GitHub App webhook).
-2. **`ff6e303`** — Remove per-minute `show-handover` cron (audit commit `1adf927` had re-added it, blocking every Vercel Hobby deploy).
-3. **`bdf038c`** — **Delete duplicate root `middleware.ts`** — was overriding `src/middleware.ts`, causing every `/admin` request to serve the old HTTP Basic Auth response even after the new cookie-based middleware was written.
-4. **`108ec7a`** — Simplify `/admin/login` page — drop Suspense wrapper so the password form renders in initial HTML (avoids "nothing to click" if JS is slow to hydrate).
-5. **`607e394`** — Fix `archive-history` cron: AzuraCast expects ISO date strings, not epoch seconds. Cron had been erroring silently since deploy → `play_history` sat at 0 rows.
-6. **`1cccb6e`** — **`/admin/reports` page + backfill endpoint + PRS/PPL CSV export.**
-   - `src/lib/azuracast-history.ts` — shared `fetchAndUpsertHistory(startIso, endIso)` helper.
-   - `POST /api/admin/backfill-history` — chunks a date range by day, upserts to `play_history`. Cookie-auth (`admin_token`).
-   - `GET /api/admin/reports/csv` — cue-sheet CSV for a date range.
-   - `src/app/admin/reports/page.tsx` + `ReportControls.tsx` — server page with stat cards, date-range picker, results table (latest 500), CSV button, backfill button.
-7. **`6cbadee`** — Add "Notes" column to CSV auto-flagging DJ-set rows + `GET /api/admin/reports/cover-letter` for a PRS/PPL-ready plain-text cover letter.
-
-Also done this session (out-of-band):
-
-- **Vercel GitHub App permissions accepted** — `Actions (read)` + `Workflows (read & write)`. Vercel had been silently missing every push since a permissions bump. Reviewed & approved at `github.com/settings/installations/115471577`.
-- **Vercel CLI logged in** locally (marc420-design). `.vercel/project.json` linked to `marc420-designs-orgs-projects/nr1-radio`.
-- **60-day history backfill run** — 803 tracks inserted into `play_history` covering 2026-05-10 → 2026-07-04. Confirmed no AzuraCast history exists prior to 2026-05-10 (retention limit on the server).
-
----
-
-## Live state at handoff
-
-- **Site**: https://listen-nr1dnb.com — live, latest bundle from `6cbadee`.
-- **Admin**: `/admin` behind cookie-auth (`ADMIN_PASSWORD=nr1admin2026`). Login form renders in initial HTML.
-- **Archive cron**: fixed, runs `0 2 * * *` UTC daily.
-- **`play_history`**: 803 rows, backfilled from AzuraCast.
-- **Vercel deploys**: auto-deploy from `main` should work again now that the GitHub App has its new permissions. The `deploy.yml` GitHub Action is kept as a belt-and-braces fallback.
-- **GitHub**: `main` @ `6cbadee`, working tree clean.
-
----
-
-## Stack quick-reference
-
-- Next.js 16.1.6 (App Router, Turbopack, React Compiler), Tailwind v4 (CSS `@theme` in `globals.css` — no `tailwind.config.ts`).
-- Supabase: `chat_messages`, `djs`, `schedule`, `events`, `shows`, **`play_history`** (new-ish, admin-only via service role).
-- AzuraCast at `radio.listen-nr1dnb.com`, station `nr1_dnb_radio`.
-- Vercel Hobby — **all crons must be daily or slower** (`* * * * *` per-minute rejects at deploy time).
-
----
-
-## Deploy notes (important — read before shipping)
-
-- `vercel --prod --yes` from the project root works (CLI is logged in, `.vercel/` linked).
-- Auto-deploy from GitHub `main` should also work now that Vercel's GitHub App has been re-approved. If it silently stops again, check `github.com/settings/installations/115471577` for a new "Permission updates requested" flag.
-- **Never re-introduce a `middleware.ts` at the repo root.** Next.js resolves that first and it will silently override `src/middleware.ts`.
-- **Never add a `* * * * *` cron to `vercel.json`.** Hobby rejects it, which fails the whole deploy.
-
----
-
-## Environment variables (Vercel, production)
-
-| Key | Set? | Notes |
-|---|---|---|
-| `ADMIN_PASSWORD` | ✓ | `nr1admin2026` — cookie value for `/admin` auth |
-| `CRON_SECRET` | ✓ | Bearer token Vercel Cron sends to `/api/cron/*` |
-| `AZURACAST_API_KEY` | ✓ | `1b9333008bfa7147:12de2bb80b0b575ef4e06ee5d5379d3a` |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✓ | Server-only; bypasses RLS |
-| `NEXT_PUBLIC_AZURACAST_BASE_URL` | ✓ | `https://radio.listen-nr1dnb.com` |
-| `NEXT_PUBLIC_STATION_ID` | ✓ | `nr1_dnb_radio` |
-| `NEXT_PUBLIC_STATION_SHORTCODE` | ✓ | `nr1_dnb_radio` |
-| `NEXT_PUBLIC_SUPABASE_URL` | ✓ | |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✓ | |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | ✓ | |
-
----
-
-## PRS/PPL prep
-
-Owner has **not applied for a licence yet** — collecting data now so historical reporting is available when they do. Everything needed is in place:
-
-- **`play_history` table** — every track AzuraCast plays, upserted nightly at 2 AM UTC.
-- **`/admin/reports`** — date-range picker, results table, `DOWNLOAD CSV`, `COVER LETTER`, `RUN BACKFILL`.
-- **CSV format** — Broadcast Date, Time UTC, Duration, Title, Artist, ISRC, Playlist, Streamer, **Notes**. DJ-set rows auto-flagged in Notes.
-- **Cover letter** — plain-text template naming the station + reporting period, and explaining that DJ-set rows are continuous mixes, not individual tracks.
-
-When they apply, likely licences:
-- PPL Small Broadcaster Radio (~£220/yr).
-- PRS Limited Online Music Licence (LOML) or Small Webcaster Tariff (listener-hours based).
-- Reporting is typically quarterly and only for the licensed period.
-
----
-
-## Audit feedback (user reviewed the live site)
-
-**Resolved / verified:**
-- Stream URL — verified `206 Partial Content` / `audio/mpeg`, 100 KB in <8s. Working.
-- Footer "Contact" — already `mailto:nr1family420@gmail.com` in `SiteChrome.tsx:85`. Crawler false positive.
-- Admin login — now works, form visible in initial HTML.
-
-**Still open (need user input or a device):**
-- Manual playback QA in VLC + Chrome + mobile data + Alexa.
-- Schedule truth-check — Listen page says "Live Fridays" but `/schedule` shows many weekly slots. Owner needs to confirm current live times before advertising.
-- DJ bios — some residents have full descriptions, others are name-only. Need content pass: role, real/artist name, style, socials, latest show link.
-- Privacy/Terms detail pass — cover live chat, Umami analytics, embedded players, directory listings, third-party data flow.
-- AzuraCast physical: disk 75% full, 135 files still to upload, nginx `413` blocking large uploads. Fix at the desktop when convenient (disk expand + `client_max_body_size` bump + `nr1upload` SFTP on port 2022 needs the router port-forward).
-
----
-
-## Suggested upgrades (all zero-cost, user is between funding rounds)
-
-**Reliability tier (protect what exists):**
-1. UptimeRobot free tier pinging site + stream.
-2. Sentry free tier (5k errors/mo).
-3. Supabase nightly JSON backup → Vercel Blob.
-4. `/api/health` endpoint (Supabase + AzuraCast reachable).
-
-**Growth tier:**
-5. Podcast RSS feed exposing the AzuraCast archive → submittable to Spotify / Apple Podcasts / Pocket Casts.
-6. PWA Web Push notifications ("DJ X is live now").
-7. "Recently played" homepage widget from `play_history`.
-8. Now-playing → Discord webhook.
-
-**Content tier:**
-9. Populate the `shows` table (currently 0 rows) and build a proper `/shows` archive listing.
-10. Per-DJ play-count / broadcast-hours stats on DJ profile pages.
-
-User to pick which bundle to start with. Reliability trio is the highest-leverage.
-
----
-
-## Files worth knowing about (added / changed this session)
-
-```
-src/middleware.ts                                 (cookie-auth for /admin)
-src/app/admin/login/page.tsx                      (simplified, no Suspense)
-src/app/admin/reports/page.tsx                    (new — server component)
-src/app/admin/reports/ReportControls.tsx          (new — client controls)
-src/app/api/admin/backfill-history/route.ts       (new — POST, cookie-auth)
-src/app/api/admin/reports/csv/route.ts            (new — GET, cookie-auth)
-src/app/api/admin/reports/cover-letter/route.ts   (new — GET, cookie-auth)
-src/app/api/cron/archive-history/route.ts         (uses shared helper)
-src/lib/azuracast-history.ts                      (new — shared helper)
-vercel.json                                       (per-minute cron removed)
-.github/workflows/deploy.yml                      (fallback deploy trigger)
-```
-
-Deleted: root `middleware.ts` (was the old HTTP Basic Auth version, was overriding `src/middleware.ts`).
+- `npm run build` is **broken on Windows** — it points Node at the bash wrapper in
+  `node_modules/.bin`. Use `node node_modules/next/dist/bin/next build`.
+- `jsdom` is not installed, so the two `src/hooks/__tests__` files cannot run.
+- `deploy.yml` fires a Vercel deploy hook *and* Vercel's Git integration also
+  builds — **every push to `main` builds twice**. The workflow is redundant.
+- Tailwind v4 config lives in `src/app/globals.css` under `@theme`.
+- Supabase project ref: `nsszwoccbmzjfqenkpgb`.
