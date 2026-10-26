@@ -78,3 +78,56 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+// --- Web push: live-show alerts -------------------------------------------
+// The payload is built in src/app/api/webhooks/azuracast/live/route.ts.
+
+self.addEventListener("push", (event) => {
+  // A push with no body, or an unparseable one, still has to show something:
+  // most browsers show their own "site updated in background" notice if a push
+  // event ends without one.
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = {};
+  }
+
+  const title = payload.title || "NR1 is live";
+  const body = payload.body || "A live show just started. Tap to listen.";
+  const url = payload.url || "/listen";
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      // Same tag collapses an earlier unread live alert instead of stacking.
+      tag: payload.tag || "nr1-live",
+      renotify: true,
+      data: { url },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/listen";
+
+  // Focus an already-open NR1 tab rather than opening a second one, so the
+  // listener does not end up with two players running at once.
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          const sameOrigin = new URL(client.url).origin === self.location.origin;
+          if (sameOrigin && "focus" in client) {
+            if ("navigate" in client) client.navigate(target);
+            return client.focus();
+          }
+        }
+        return self.clients.openWindow(target);
+      })
+  );
+});

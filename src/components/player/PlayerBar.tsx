@@ -6,6 +6,7 @@ import { NowPlayingCard } from "./NowPlayingCard";
 import { LiveBadge } from "./LiveBadge";
 import { VolumeControl } from "./VolumeControl";
 import { EqualizerBars } from "./EqualizerBars";
+import { NotifyButton } from "./NotifyButton";
 import { ShareButton } from "@/components/ui/ShareButton";
 
 /**
@@ -14,15 +15,19 @@ import { ShareButton } from "@/components/ui/ShareButton";
  * The persistent sticky bottom bar (StickyPlayer) is rendered in the root layout.
  */
 export function PlayerBar() {
-  const { play, pause, setVolume, toggleMute, isPlaying, isMuted, volume, status, track, artist, artwork, isLive, isOnline, listenerCount, uniqueListeners, hasLoaded } = usePlayer();
+  const { play, pause, setVolume, toggleMute, isPlaying, isMuted, volume, status, track, artist, artwork, isLive, isOnline, listenerCount, uniqueListeners, hasLoaded, isStale } = usePlayer();
 
   return (
     <div className="flex justify-center w-full">
       <div className="player-card flex flex-col items-center gap-6 py-6 px-5 sm:py-10 sm:px-12 w-full max-w-md">
         <div className="flex items-center gap-4">
-          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} hasLoaded={hasLoaded} />
+          <LiveBadge isLive={isLive} isOnline={isOnline} status={status} hasLoaded={hasLoaded} isStale={isStale} />
           <EqualizerBars isPlaying={isPlaying} />
         </div>
+        {/* Only offered when a live show is not already on: there is nothing to
+            be alerted about mid-broadcast. Renders nothing where push is
+            unavailable, so the row can collapse to empty. */}
+        {!isLive && <NotifyButton />}
         <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
         <NowPlayingCard track={track} artist={artist} artwork={artwork} />
         {listenerCount > 0 && (
