@@ -118,9 +118,12 @@ internet-radio pointed at listings that **don't exist**, Streema was missing.
 
 ## What's left
 
-1. **Visa-5019 is dead** — Google Play: Suno £9.49 **due 31 Oct**, Kimi £17.49
-   overdue, plus £42.97 of YouTube/Google One renewals 19–22 Nov on the same card.
-   Mixcloud was already fixed.
+1. **Visa-5019 is dead.** Suno and Kimi were **deliberately dropped on 26 Oct** —
+   do not raise them again. Still outstanding on the same card: YouTube Premium
+   Family £19.99 (20 Nov), YouTube membership £3.99 (19 Nov) and Google One AI
+   Pro 5 TB £18.99 (22 Nov), which will fail unless it is replaced. Check whether
+   station assets live in that 5 TB before letting it lapse. Mixcloud was on the
+   same card and is already fixed.
 2. **myTuner home address** — see top.
 3. **TuneIn listing.**
 4. **Friday** — first real `live_connect` push test.
