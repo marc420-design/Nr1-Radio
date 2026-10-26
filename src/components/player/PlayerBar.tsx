@@ -6,6 +6,7 @@ import { NowPlayingCard } from "./NowPlayingCard";
 import { LiveBadge } from "./LiveBadge";
 import { VolumeControl } from "./VolumeControl";
 import { EqualizerBars } from "./EqualizerBars";
+import { NotifyButton } from "./NotifyButton";
 import { ShareButton } from "@/components/ui/ShareButton";
 
 /**
@@ -23,6 +24,10 @@ export function PlayerBar() {
           <LiveBadge isLive={isLive} isOnline={isOnline} status={status} hasLoaded={hasLoaded} isStale={isStale} />
           <EqualizerBars isPlaying={isPlaying} />
         </div>
+        {/* Only offered when a live show is not already on: there is nothing to
+            be alerted about mid-broadcast. Renders nothing where push is
+            unavailable, so the row can collapse to empty. */}
+        {!isLive && <NotifyButton />}
         <PlayPauseButton isPlaying={isPlaying} status={status} onPlay={play} onPause={pause} />
         <NowPlayingCard track={track} artist={artist} artwork={artwork} />
         {listenerCount > 0 && (
