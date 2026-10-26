@@ -86,7 +86,14 @@ export async function GET() {
       })
       .sort((a, b) => b.count - a.count);
 
-    return NextResponse.json({ total: data.length, byCountry, byCity });
+    // Only the existing public aggregates are cached, never the upstream list
+    // of individual listeners or its authenticated request.
+    return NextResponse.json({ total: data.length, byCountry, byCity }, {
+      headers: {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=30",
+      },
+    });
   } catch {
     return NextResponse.json({ total: 0, byCountry: [], byCity: [] }, { status: 503 });
   }

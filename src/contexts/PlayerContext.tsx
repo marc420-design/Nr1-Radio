@@ -32,7 +32,7 @@ const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 function PlayerProviderInner({ children }: { children: ReactNode }) {
   const audio = useAudioStream();
-  const nowPlaying = useNowPlaying();
+  const nowPlaying = useNowPlaying(audio.isPlaying);
 
   // Media Session lives here so it persists across navigation
   useMediaSession({
