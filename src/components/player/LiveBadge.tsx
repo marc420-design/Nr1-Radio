@@ -7,9 +7,17 @@ interface LiveBadgeProps {
   isOnline: boolean;
   status: StreamStatus;
   hasLoaded?: boolean;
+  /** Now-playing data has gone stale; isLive and isOnline cannot be trusted. */
+  isStale?: boolean;
 }
 
-export function LiveBadge({ isLive, isOnline, status, hasLoaded = true }: LiveBadgeProps) {
+export function LiveBadge({
+  isLive,
+  isOnline,
+  status,
+  hasLoaded = true,
+  isStale = false,
+}: LiveBadgeProps) {
   if (!hasLoaded) {
     return (
       <span
@@ -38,17 +46,41 @@ export function LiveBadge({ isLive, isOnline, status, hasLoaded = true }: LiveBa
     );
   }
 
-  if (status === "offline" || !isOnline) {
+  const offlineBadge = (
+    <span
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-nr1-muted/20 text-nr1-muted border border-nr1-muted/30"
+      role="status"
+      aria-label="Station status: Offline"
+    >
+      <span className="w-2 h-2 rounded-full bg-nr1-muted" aria-hidden="true" />
+      Offline
+    </span>
+  );
+
+  // The audio element going offline is first-hand evidence, so it still wins.
+  if (status === "offline") {
+    return offlineBadge;
+  }
+
+  // Beyond this point every branch reads polled station data. If that data has
+  // stopped arriving, show nothing rather than a Live badge for a broadcast that
+  // may have ended, or an Offline badge for a station that is still up.
+  if (isStale) {
     return (
-      <span 
-        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-nr1-muted/20 text-nr1-muted border border-nr1-muted/30"
+      <span
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-nr1-muted/10 text-nr1-muted/70 border border-nr1-muted/20"
         role="status"
-        aria-label="Station status: Offline"
+        aria-label="Station status: Unknown, waiting for station data"
+        aria-live="polite"
       >
-        <span className="w-2 h-2 rounded-full bg-nr1-muted" aria-hidden="true" />
-        Offline
+        <span className="w-2 h-2 rounded-full bg-nr1-muted/50" aria-hidden="true" />
+        —
       </span>
     );
+  }
+
+  if (!isOnline) {
+    return offlineBadge;
   }
 
   if (isLive) {

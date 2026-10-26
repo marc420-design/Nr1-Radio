@@ -25,6 +25,7 @@ interface PlayerContextValue {
   history: HistoryEntry[];
   isOnline: boolean;
   hasLoaded: boolean;
+  isStale: boolean;
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -52,6 +53,7 @@ function PlayerProviderInner({ children }: { children: ReactNode }) {
       nowPlaying.isLive, nowPlaying.streamerName,
       nowPlaying.listenerCount, nowPlaying.uniqueListeners,
       nowPlaying.isOnline, nowPlaying.history, nowPlaying.hasLoaded,
+      nowPlaying.isStale,
     ]
   );
 

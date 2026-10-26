@@ -15,7 +15,14 @@ interface NowPlayingState {
   history: HistoryEntry[];
   isOnline: boolean;
   hasLoaded: boolean;
+  /** Polling has stopped answering, so the fields above are no longer current. */
+  isStale: boolean;
 }
+
+// Three consecutive missed polls. Long enough to ride out a single blip, short
+// enough that a Live badge cannot outlive the broadcast by more than a minute.
+const POLL_INTERVAL_MS = 15_000;
+const STALE_AFTER_MS = POLL_INTERVAL_MS * 3;
 
 const DEFAULT_STATE: NowPlayingState = {
   track: "",
@@ -28,6 +35,7 @@ const DEFAULT_STATE: NowPlayingState = {
   history: [],
   isOnline: false,
   hasLoaded: false,
+  isStale: false,
 };
 
 function parseNowPlaying(data: NowPlayingData): NowPlayingState {
@@ -35,28 +43,45 @@ function parseNowPlaying(data: NowPlayingData): NowPlayingState {
     track: cleanTitle(data.now_playing?.song.title ?? ""),
     artist: data.now_playing?.song.artist ?? "",
     artwork: data.now_playing?.song.art ?? "",
-    isLive: data.live.is_live,
-    streamerName: data.live.streamer_name,
-    listenerCount: data.listeners.current,
-    uniqueListeners: data.listeners.unique,
+    // Defensive: a truncated or reshaped upstream payload must not throw inside
+    // setState, which would leave the previous state frozen and look fresh.
+    isLive: data.live?.is_live ?? false,
+    streamerName: data.live?.streamer_name ?? "",
+    listenerCount: data.listeners?.current ?? 0,
+    uniqueListeners: data.listeners?.unique ?? 0,
     history: data.song_history ?? [],
-    isOnline: data.is_online,
+    isOnline: data.is_online ?? false,
     hasLoaded: true,
+    isStale: false,
   };
 }
 
 export function useNowPlaying(): NowPlayingState {
   const [state, setState] = useState<NowPlayingState>(DEFAULT_STATE);
+  const lastSuccessRef = useRef(0);
 
   const poll = useCallback(async () => {
     try {
       // Use the server-side proxy to avoid mixed-content blocking
       const res = await fetch("/api/nowplaying", { cache: "no-store" });
-      if (!res.ok) return;
-      const data = (await res.json()) as NowPlayingData;
+      if (!res.ok) throw new Error(`nowplaying ${res.status}`);
+      const data = (await res.json()) as NowPlayingData | { error: string };
+      // The proxy reports upstream trouble as an { error } body; that is a failed
+      // poll, not a station that fell silent.
+      if (!data || typeof data !== "object" || "error" in data) {
+        throw new Error("nowplaying payload unusable");
+      }
+      lastSuccessRef.current = Date.now();
       setState(parseNowPlaying(data));
     } catch {
-      // Silently fail — keep last known state
+      // Keep the last known track, but stop claiming the live state once we have
+      // gone long enough without confirmation. Previously this returned silently,
+      // so an unreachable API froze a Live badge on screen indefinitely.
+      setState((prev) => {
+        if (!prev.hasLoaded) return prev;
+        if (Date.now() - lastSuccessRef.current <= STALE_AFTER_MS) return prev;
+        return prev.isStale ? prev : { ...prev, isStale: true };
+      });
     }
   }, []);
 
@@ -66,7 +91,7 @@ export function useNowPlaying(): NowPlayingState {
   // so now-playing stayed frozen until the connection dropped at 300s.
   useEffect(() => {
     poll();
-    const id = setInterval(poll, 15_000);
+    const id = setInterval(poll, POLL_INTERVAL_MS);
     return () => {
       clearInterval(id);
     };
