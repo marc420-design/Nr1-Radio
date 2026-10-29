@@ -27,7 +27,10 @@ export function useAudioStream(): UseAudioStreamReturn {
   const retryTimerRef         = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watchdogRef           = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bufferCheckRef        = useRef<ReturnType<typeof setInterval> | null>(null);
-  const isIntentionalPauseRef = useRef(false);
+  const isIntentionalPauseRef = useRef(true);
+  // Keep the working route for this session once the direct host fails.
+  const useProxyRef = useRef(false);
+  const attemptRef = useRef(0);
   // true while load()+play() is in flight — suppresses the pause event that
   // audio.load() fires internally so it doesn't stack extra retry timers.
   const isReconnectingRef     = useRef(false);
@@ -36,6 +39,7 @@ export function useAudioStream(): UseAudioStreamReturn {
   // so they never hold stale closures.
   const hardReconnectRef  = useRef<() => void>(() => {});
   const scheduleRetryRef  = useRef<() => void>(() => {});
+  const armWatchdogRef = useRef<() => void>(() => {});
 
   const [isPlaying,   setIsPlaying]   = useState(false);
   const [isMuted,     setIsMuted]     = useState(false);
@@ -66,20 +70,35 @@ export function useAudioStream(): UseAudioStreamReturn {
       // Flag stays true until "playing" fires (or play() rejects)
       // — suppresses the pause event that audio.load() fires internally.
       isReconnectingRef.current = true;
-      audio.src    = `${getStreamUrl()}?_t=${Date.now()}`;
+      const attempt = ++attemptRef.current;
+      audio.src    = `${useProxyRef.current ? "/api/stream" : getStreamUrl()}?_t=${Date.now()}`;
       audio.volume = vol;
       audio.muted  = muted;
       audio.load();
-      audio.play().catch(() => {
+      armWatchdogRef.current();
+      audio.play().catch((error: unknown) => {
+        if (attempt !== attemptRef.current || isIntentionalPauseRef.current) return;
         isReconnectingRef.current = false;
+        if (error instanceof DOMException && error.name === "NotAllowedError") {
+          clearWatchdog();
+          isIntentionalPauseRef.current = true;
+          setStatus("idle");
+          setIsPlaying(false);
+          return;
+        }
         scheduleRetryRef.current();
       });
     }
 
     function scheduleRetry() {
       if (isIntentionalPauseRef.current) return;
+      // error and a rejected play() can describe the same failed connection.
+      if (retryTimerRef.current) return;
+      clearWatchdog();
       clearBufferCheck();
-      clearRetryTimer();
+      // The direct stream can be unreachable on a listener's network even
+      // while the website can reach it. The proxy also reconnects on expiry.
+      useProxyRef.current = true;
       const delay = BACKOFF_DELAYS[Math.min(retryCountRef.current, BACKOFF_DELAYS.length - 1)];
       retryCountRef.current++;
       if (retryCountRef.current >= 4) {
@@ -117,6 +136,7 @@ export function useAudioStream(): UseAudioStreamReturn {
         if (!isIntentionalPauseRef.current) scheduleRetryRef.current();
       }, WATCHDOG_MS);
     };
+    armWatchdogRef.current = armWatchdog;
 
     const startBufferCheck = () => {
       clearBufferCheck();
@@ -220,6 +240,10 @@ export function useAudioStream(): UseAudioStreamReturn {
       clearWatchdog();
       clearBufferCheck();
       clearRetryTimer();
+      isIntentionalPauseRef.current = true;
+      // This counter invalidates pending play promises; it is not a DOM ref.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      attemptRef.current++;
       window.removeEventListener("online", handleOnline);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       audio.pause();
@@ -233,14 +257,28 @@ export function useAudioStream(): UseAudioStreamReturn {
     const audio = audioRef.current;
     if (!audio) return;
     isIntentionalPauseRef.current = false;
-    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     retryCountRef.current = 0;
     setStatus("loading");
     isReconnectingRef.current = true;
-    audio.src = `${getStreamUrl()}?_t=${Date.now()}`;
+    const attempt = ++attemptRef.current;
+    audio.src = `${useProxyRef.current ? "/api/stream" : getStreamUrl()}?_t=${Date.now()}`;
     audio.load();
-    audio.play().catch(() => {
+    // Some mobile browsers never emit waiting/error for a hung connection.
+    armWatchdogRef.current();
+    audio.play().catch((error: unknown) => {
+      if (attempt !== attemptRef.current || isIntentionalPauseRef.current) return;
       isReconnectingRef.current = false;
+      if (error instanceof DOMException && error.name === "NotAllowedError") {
+        if (watchdogRef.current) clearTimeout(watchdogRef.current);
+        isIntentionalPauseRef.current = true;
+        setStatus("idle");
+        setIsPlaying(false);
+        return;
+      }
       scheduleRetryRef.current();
     });
   }, []);
@@ -249,8 +287,12 @@ export function useAudioStream(): UseAudioStreamReturn {
     const audio = audioRef.current;
     if (!audio) return;
     isIntentionalPauseRef.current = true;
+    attemptRef.current++;
     isReconnectingRef.current     = false;
-    if (retryTimerRef.current)  clearTimeout(retryTimerRef.current);
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     if (watchdogRef.current)    clearTimeout(watchdogRef.current);
     if (bufferCheckRef.current) clearInterval(bufferCheckRef.current);
     audio.pause();
